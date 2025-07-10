@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../firebase';
-import { collection, getDocs, query, orderBy, where } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, deleteDoc, doc, writeBatch } from 'firebase/firestore';
 import './Dashboard.css';
 
 const InvoiceList = () => {
@@ -11,6 +11,7 @@ const InvoiceList = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -22,26 +23,58 @@ const InvoiceList = () => {
   };
 
   useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const invoicesData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate(),
-          dueDate: doc.data().dueDate?.toDate()
-        }));
-        setInvoices(invoicesData);
-      } catch (error) {
-        console.error('Error fetching invoices:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchInvoices();
+    // eslint-disable-next-line
   }, []);
+
+  const fetchInvoices = async () => {
+    setLoading(true);
+    try {
+      const q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const invoicesData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
+        dueDate: doc.data().dueDate?.toDate()
+      }));
+      setInvoices(invoicesData);
+    } catch (error) {
+      console.error('Error fetching invoices:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteInvoice = async (invoiceId) => {
+    if (!window.confirm('Are you sure you want to delete this invoice?')) return;
+    setDeleting(true);
+    try {
+      await deleteDoc(doc(db, 'invoices', invoiceId));
+      setInvoices(invoices => invoices.filter(inv => inv.id !== invoiceId));
+    } catch (error) {
+      alert('Failed to delete invoice.');
+    }
+    setDeleting(false);
+  };
+
+  const handleDeleteAll = async () => {
+    if (!window.confirm('Are you sure you want to delete ALL invoices? This cannot be undone.')) return;
+    setDeleting(true);
+    try {
+      const q = query(collection(db, 'invoices'));
+      const querySnapshot = await getDocs(q);
+      const batch = writeBatch(db);
+      querySnapshot.forEach(docSnap => {
+        batch.delete(doc(db, 'invoices', docSnap.id));
+      });
+      await batch.commit();
+      setInvoices([]);
+    } catch (error) {
+      alert('Failed to delete all invoices.');
+    }
+    setDeleting(false);
+  };
 
   const getStatusColor = (invoice) => {
     if (!invoice.dueDate) return '#6c757d';
@@ -179,20 +212,38 @@ const InvoiceList = () => {
                 <option value="on-track">On Track</option>
               </select>
             </div>
-            <Link 
-              to="/invoices/new"
-              style={{
-                padding: '10px 20px',
-                background: '#6a11cb',
-                color: 'white',
-                textDecoration: 'none',
-                borderRadius: '5px',
-                fontSize: '14px',
-                fontWeight: '600'
-              }}
-            >
-              + Create New Invoice
-            </Link>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <Link 
+                to="/invoices/new"
+                style={{
+                  padding: '10px 20px',
+                  background: '#6a11cb',
+                  color: 'white',
+                  textDecoration: 'none',
+                  borderRadius: '5px',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}
+              >
+                + Create New Invoice
+              </Link>
+              <button
+                onClick={handleDeleteAll}
+                disabled={deleting || invoices.length === 0}
+                style={{
+                  padding: '10px 20px',
+                  background: '#ff4757',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: deleting || invoices.length === 0 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                Delete All
+              </button>
+            </div>
           </div>
 
           {filteredInvoices.length === 0 ? (
@@ -212,6 +263,7 @@ const InvoiceList = () => {
                     <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Due Date</th>
                     <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Payment Terms</th>
                     <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Created</th>
+                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -253,6 +305,24 @@ const InvoiceList = () => {
                       </td>
                       <td style={{ padding: '15px' }}>
                         {formatDate(invoice.createdAt)}
+                      </td>
+                      <td style={{ padding: '15px' }}>
+                        <button
+                          onClick={() => handleDeleteInvoice(invoice.id)}
+                          disabled={deleting}
+                          style={{
+                            padding: '8px 14px',
+                            background: '#ff4757',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '5px',
+                            fontSize: '13px',
+                            fontWeight: '600',
+                            cursor: deleting ? 'not-allowed' : 'pointer'
+                          }}
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))}

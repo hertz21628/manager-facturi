@@ -8,6 +8,7 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import InvoiceCreation from './components/InvoiceCreation';
 import InvoiceList from './components/InvoiceList';
+import ClientManagement from './components/ClientManagement';
 import './App.css';
 
 function App() {
@@ -42,6 +43,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <InvoiceList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/clients"
+            element={
+              <ProtectedRoute>
+                <ClientManagement />
               </ProtectedRoute>
             }
           />
