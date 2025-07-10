@@ -10,6 +10,7 @@ import InvoiceCreation from './components/InvoiceCreation';
 import InvoiceList from './components/InvoiceList';
 import ClientManagement from './components/ClientManagement';
 import PDFGeneration from './components/PDFGeneration';
+import Reports from './components/Reports';
 import './App.css';
 
 function App() {
@@ -60,6 +61,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ClientManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <Reports />
               </ProtectedRoute>
             }
           />

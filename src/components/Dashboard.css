@@ -100,3 +100,22 @@
     line-height: 1.5;
     color: #555;
   }
+
+.sidebar-footer .logout-btn {
+  width: 100%;
+  padding: 12px 0;
+  background: linear-gradient(90deg, #ff4757 0%, #ff6b81 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(255, 71, 87, 0.08);
+}
+.sidebar-footer .logout-btn:hover {
+  background: linear-gradient(90deg, #ff6b81 0%, #ff4757 100%);
+  box-shadow: 0 4px 16px rgba(255, 71, 87, 0.16);
+}

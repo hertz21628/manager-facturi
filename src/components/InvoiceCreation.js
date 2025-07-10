@@ -80,7 +80,7 @@ const InvoiceCreation = () => {
           <Link to="/settings" className="nav-link">Settings</Link>
         </nav>
         <div className="sidebar-footer">
-          <button onClick={handleLogout} className="nav-link" style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' }}>
+          <button onClick={handleLogout} className="logout-btn">
             Logout
           </button>
         </div>

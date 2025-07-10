@@ -103,7 +103,7 @@ const PDFGeneration = () => {
           <Link to="/invoices/pdf" className="nav-link active">PDF Generation</Link>
         </nav>
         <div className="sidebar-footer">
-          <button onClick={handleLogout} className="nav-link" style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' }}>
+          <button onClick={handleLogout} className="logout-btn">
             Logout
           </button>
         </div>
