@@ -9,6 +9,7 @@ import Dashboard from './components/Dashboard';
 import InvoiceCreation from './components/InvoiceCreation';
 import InvoiceList from './components/InvoiceList';
 import ClientManagement from './components/ClientManagement';
+import PDFGeneration from './components/PDFGeneration';
 import './App.css';
 
 function App() {
@@ -43,6 +44,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <InvoiceList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/invoices/pdf"
+            element={
+              <ProtectedRoute>
+                <PDFGeneration />
               </ProtectedRoute>
             }
           />
