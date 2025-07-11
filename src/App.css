@@ -111,3 +111,22 @@ body.dark-theme .invoice-th {
   color: #fff !important;
   background: none;
 }
+
+.dashboard-th {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #6a11cb;
+  font-weight: 600;
+}
+body.dark-theme .dashboard-th {
+  color: #fff !important;
+}
+
+.dashboard-desc {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #555;
+}
+body.dark-theme .dashboard-desc {
+  color: #e0e0e0 !important;
+}

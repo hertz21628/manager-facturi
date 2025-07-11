@@ -42,20 +42,20 @@ const Dashboard = () => {
         </header>
         <section className="features-grid">
           <Link to="/clients" className="feature-card">
-            <h3>Client Management</h3>
-            <p>Add, view, and organize your client information.</p>
+            <h3 className="dashboard-th">Client Management</h3>
+            <p className="dashboard-desc">Add, view, and organize your client information.</p>
           </Link>
           <Link to="/invoices/new" className="feature-card">
-            <h3>Invoice Creation</h3>
-            <p>Create and customize professional invoices in minutes.</p>
+            <h3 className="dashboard-th">Invoice Creation</h3>
+            <p className="dashboard-desc">Create and customize professional invoices in minutes.</p>
           </Link>
           <Link to="/invoices" className="feature-card">
-            <h3>Invoice List & Status</h3>
-            <p>Track the status of all your invoices, from sent to paid.</p>
+            <h3 className="dashboard-th">Invoice List & Status</h3>
+            <p className="dashboard-desc">Track the status of all your invoices, from sent to paid.</p>
           </Link>
           <Link to="/invoices/pdf" className="feature-card">
-            <h3>PDF Generation</h3>
-            <p>Generate and download PDF versions of your invoices.</p>
+            <h3 className="dashboard-th">PDF Generation</h3>
+            <p className="dashboard-desc">Generate and download PDF versions of your invoices.</p>
           </Link>
         </section>
       </main>

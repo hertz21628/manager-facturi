@@ -211,11 +211,11 @@ const ClientManagement = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid #e9ecef' }}>
-                  <th style={{ padding: 15, textAlign: 'left', fontWeight: 600, color: '#333', cursor: 'pointer' }} onClick={() => handleSort('name')}>Name {sortBy === 'name' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
-                  <th style={{ padding: 15, textAlign: 'left', fontWeight: 600, color: '#333', cursor: 'pointer' }} onClick={() => handleSort('email')}>Email {sortBy === 'email' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
-                  <th style={{ padding: 15, textAlign: 'left', fontWeight: 600, color: '#333', cursor: 'pointer' }} onClick={() => handleSort('company')}>Company {sortBy === 'company' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
-                  <th style={{ padding: 15, textAlign: 'left', fontWeight: 600, color: '#333', cursor: 'pointer' }} onClick={() => handleSort('phone')}>Phone {sortBy === 'phone' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
-                  <th style={{ padding: 15, textAlign: 'left', fontWeight: 600, color: '#333' }}>Actions</th>
+                  <th className="invoice-th">Name {sortBy === 'name' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                  <th className="invoice-th">Email {sortBy === 'email' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                  <th className="invoice-th">Company {sortBy === 'company' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                  <th className="invoice-th" onClick={() => handleSort('phone')}>Phone {sortBy === 'phone' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                  <th className="invoice-th">Actions</th>
                 </tr>
               </thead>
               <tbody>
