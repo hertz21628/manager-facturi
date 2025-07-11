@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import ThemeSwitcher from './ThemeSwitcher';
@@ -26,8 +26,8 @@ const ClientPayments = () => {
       const invoicesRef = collection(db, 'invoices');
       const invoicesQuery = query(
         invoicesRef,
-        where('clientEmail', '==', currentUser.email),
-        orderBy('date', 'desc')
+        where('clientEmail', '==', currentUser.email)
+        // orderBy('date', 'desc')
       );
       const invoicesSnapshot = await getDocs(invoicesQuery);
       
@@ -36,7 +36,14 @@ const ClientPayments = () => {
         invoicesData.push({ id: doc.id, ...doc.data() });
       });
 
-      setInvoices(invoicesData);
+      // Sort by date in JavaScript (newest first)
+      const sortedInvoices = invoicesData.sort((a, b) => {
+        const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+        const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+        return dateB - dateA;
+      });
+
+      setInvoices(sortedInvoices);
 
       // Fetch payment history (mock data for now)
       const mockPayments = [
@@ -107,16 +114,27 @@ const ClientPayments = () => {
     console.log('Processing payment:', paymentData);
     
     // Mock payment processing
-    setTimeout(() => {
+    setTimeout(async () => {
       alert('Payment processed successfully!');
       setShowPaymentModal(false);
       setSelectedInvoice(null);
+      // Mark invoice as completed in Firestore
+      if (paymentData.invoiceId) {
+        try {
+          const invoiceRef = doc(db, 'invoices', paymentData.invoiceId);
+          await updateDoc(invoiceRef, { status: 'completed' });
+        } catch (err) {
+          console.error('Error updating invoice status:', err);
+        }
+      }
       // Refresh data
       fetchData();
     }, 2000);
   };
 
-  const outstandingInvoices = invoices.filter(inv => inv.status !== 'paid');
+  // Use real completed invoices for payment history
+  const outstandingInvoices = invoices.filter(inv => inv.status !== 'completed');
+  const completedInvoices = invoices.filter(inv => inv.status === 'completed');
   const totalOutstanding = outstandingInvoices.reduce((sum, inv) => sum + (inv.total || 0), 0);
 
   if (loading) {
@@ -236,7 +254,7 @@ const ClientPayments = () => {
               <p>View your past payment transactions</p>
             </div>
 
-            {payments.length === 0 ? (
+            {completedInvoices.length === 0 ? (
               <div className="no-payments">
                 <i className="fas fa-history"></i>
                 <h3>No payment history</h3>
@@ -248,36 +266,20 @@ const ClientPayments = () => {
                   <div className="header-cell">Date</div>
                   <div className="header-cell">Invoice #</div>
                   <div className="header-cell">Amount</div>
-                  <div className="header-cell">Method</div>
                   <div className="header-cell">Status</div>
-                  <div className="header-cell">Reference</div>
                 </div>
-                
                 <div className="table-body">
-                  {payments.map((payment) => (
-                    <div key={payment.id} className="table-row">
+                  {completedInvoices.sort((a, b) => {
+                    const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+                    const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+                    return dateB - dateA;
+                  }).map((inv) => (
+                    <div key={inv.id} className="table-row">
+                      <div className="table-cell">{formatDate(inv.date)}</div>
+                      <div className="table-cell">{inv.invoiceNumber}</div>
+                      <div className="table-cell">{formatCurrency(inv.total)}</div>
                       <div className="table-cell">
-                        {formatDate(payment.date)}
-                      </div>
-                      <div className="table-cell">
-                        <strong>{payment.invoiceNumber}</strong>
-                      </div>
-                      <div className="table-cell amount">
-                        <strong>{formatCurrency(payment.amount)}</strong>
-                      </div>
-                      <div className="table-cell">
-                        {payment.method}
-                      </div>
-                      <div className="table-cell">
-                        <span 
-                          className="status-badge"
-                          style={{ backgroundColor: getStatusColor(payment.status) }}
-                        >
-                          {payment.status}
-                        </span>
-                      </div>
-                      <div className="table-cell">
-                        <small>{payment.reference}</small>
+                        <span className="status-badge" style={{ backgroundColor: getStatusColor(inv.status) }}>{inv.status}</span>
                       </div>
                     </div>
                   ))}

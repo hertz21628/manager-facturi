@@ -52,7 +52,7 @@ const Settings = () => {
     <div className="dashboard-container">
       <aside className="sidebar">
         <div className="sidebar-header">
-          <h2>InvoiceApp</h2>
+          <h2>{t('InvoiceApp')}</h2>
         </div>
         <nav className="sidebar-nav">
           <Link to="/dashboard" className="nav-link">{t('Dashboard')}</Link>
@@ -78,7 +78,7 @@ const Settings = () => {
               onChange={e => setLanguage(e.target.value)}
               style={{ width: '100%', padding: 12, borderRadius: 6, border: '1px solid #ddd', fontSize: 16 }}
             >
-              {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
+              {LANGUAGES.map(l => <option key={l.code} value={l.code}>{t(l.label)}</option>)}
             </select>
           </div>
           <div style={{ marginBottom: 30 }}>
@@ -92,8 +92,8 @@ const Settings = () => {
             </select>
           </div>
           <div style={{ color: '#888', fontSize: 14 }}>
-            <p><strong>{t('Language')}:</strong> {t('Language')} of the interface (where translations are available).</p>
-            <p><strong>{t('Theme')}:</strong> {t('Theme')} of the website.</p>
+            <p><strong>{t('Language')}:</strong> {t('Language')} {t('of the interface (where translations are available).')}</p>
+            <p><strong>{t('Theme')}:</strong> {t('Theme')} {t('of the website.')}</p>
           </div>
         </div>
       </main>
