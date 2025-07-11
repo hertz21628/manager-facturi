@@ -9,6 +9,13 @@ import './Dashboard.css';
 const defaultLine = { description: '', quantity: 1, price: 0, tax: 0 };
 const currencySymbols = { USD: '$', EUR: '€', RON: 'lei', GBP: '£' };
 
+const recurringFrequencies = [
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'quarterly', label: 'Quarterly' },
+  { value: 'yearly', label: 'Yearly' },
+];
+
 const InvoiceCreation = () => {
   const navigate = useNavigate();
   const [lineItems, setLineItems] = useState([ { ...defaultLine } ]);
@@ -19,6 +26,11 @@ const InvoiceCreation = () => {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [currency, setCurrency] = useState('USD');
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurringFrequency, setRecurringFrequency] = useState('monthly');
+  const [recurringStart, setRecurringStart] = useState('');
+  const [recurringEnd, setRecurringEnd] = useState('');
+  const [recurringOccurrences, setRecurringOccurrences] = useState('');
 
   const handleLogout = async () => {
     try {
@@ -57,6 +69,11 @@ const InvoiceCreation = () => {
         dueDate: dueDate ? Timestamp.fromDate(new Date(dueDate)) : null,
         createdAt: Timestamp.now(),
         currency,
+        isRecurring,
+        recurringFrequency: isRecurring ? recurringFrequency : null,
+        recurringStart: isRecurring && recurringStart ? Timestamp.fromDate(new Date(recurringStart)) : null,
+        recurringEnd: isRecurring && recurringEnd ? Timestamp.fromDate(new Date(recurringEnd)) : null,
+        recurringOccurrences: isRecurring && recurringOccurrences ? Number(recurringOccurrences) : null,
       });
       setSuccess('Invoice saved successfully!');
       setLineItems([ { ...defaultLine } ]);
@@ -64,6 +81,11 @@ const InvoiceCreation = () => {
       setPaymentTerms('Net 30');
       setDueDate('');
       setCurrency('USD');
+      setIsRecurring(false);
+      setRecurringFrequency('monthly');
+      setRecurringStart('');
+      setRecurringEnd('');
+      setRecurringOccurrences('');
     } catch (err) {
       setError('Failed to save invoice.');
     }
@@ -297,6 +319,63 @@ const InvoiceCreation = () => {
                 <option value="RON">Romanian Leu (lei)</option>
                 <option value="GBP">British Pound (£)</option>
               </select>
+            </div>
+
+            <div style={{ marginBottom: '30px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                <input
+                  type="checkbox"
+                  checked={isRecurring}
+                  onChange={e => setIsRecurring(e.target.checked)}
+                  style={{ marginRight: 8 }}
+                />
+                Recurring Invoice
+              </label>
+              {isRecurring && (
+                <div style={{ marginTop: 10, paddingLeft: 8 }}>
+                  <div style={{ marginBottom: 10 }}>
+                    <label style={{ fontWeight: 500, marginRight: 8 }}>Frequency:</label>
+                    <select
+                      value={recurringFrequency}
+                      onChange={e => setRecurringFrequency(e.target.value)}
+                      style={{ padding: '8px', borderRadius: 5, border: '1px solid #ddd', fontSize: 14 }}
+                    >
+                      {recurringFrequencies.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <label style={{ fontWeight: 500, marginRight: 8 }}>Start Date:</label>
+                    <input
+                      type="date"
+                      value={recurringStart}
+                      onChange={e => setRecurringStart(e.target.value)}
+                      style={{ padding: '8px', borderRadius: 5, border: '1px solid #ddd', fontSize: 14 }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <label style={{ fontWeight: 500, marginRight: 8 }}>End Date (optional):</label>
+                    <input
+                      type="date"
+                      value={recurringEnd}
+                      onChange={e => setRecurringEnd(e.target.value)}
+                      style={{ padding: '8px', borderRadius: 5, border: '1px solid #ddd', fontSize: 14 }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <label style={{ fontWeight: 500, marginRight: 8 }}>Occurrences (optional):</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={recurringOccurrences}
+                      onChange={e => setRecurringOccurrences(e.target.value)}
+                      style={{ padding: '8px', borderRadius: 5, border: '1px solid #ddd', fontSize: 14, width: 100 }}
+                    />
+                  </div>
+                  <div style={{ color: '#888', fontSize: 13 }}>
+                    <p>Recurring invoices will be automatically generated based on the selected frequency, starting from the start date. You can set either an end date or a number of occurrences (or both).</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div style={{ 
