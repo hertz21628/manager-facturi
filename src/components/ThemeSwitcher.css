@@ -1,0 +1,84 @@
+.theme-switcher {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #333;
+  font-size: 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-switcher:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.theme-switcher:active {
+  transform: scale(0.95);
+}
+
+.theme-switcher i {
+  transition: transform 0.3s ease;
+}
+
+.theme-switcher:hover i {
+  transform: rotate(15deg);
+}
+
+/* Dark theme styles */
+.dark-theme .theme-switcher {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.dark-theme .theme-switcher:hover {
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Animation for theme switch */
+.theme-switcher::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.theme-switcher:active::before {
+  width: 100px;
+  height: 100px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .theme-switcher {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-switcher {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+} 

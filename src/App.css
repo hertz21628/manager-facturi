@@ -162,3 +162,44 @@ body.dark-theme .dashboard-th {
 body.dark-theme .dashboard-desc {
   color: #e0e0e0 !important;
 }
+
+/* Global dark theme transitions */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Dark theme scrollbar */
+.dark-theme ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dark-theme ::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Light theme scrollbar */
+.light-theme ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.light-theme ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.light-theme ::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.light-theme ::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

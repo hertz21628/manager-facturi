@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { db } from '../firebase';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, getDocs, query, orderBy } from 'firebase/firestore';
 import './Dashboard.css';
 
 const defaultLine = { description: '', quantity: 1, price: 0, tax: 0 };
@@ -18,6 +18,8 @@ const recurringFrequencies = [
 
 const InvoiceCreation = () => {
   const navigate = useNavigate();
+  const [clients, setClients] = useState([]);
+  const [selectedClient, setSelectedClient] = useState('');
   const [lineItems, setLineItems] = useState([ { ...defaultLine } ]);
   const [discount, setDiscount] = useState(0);
   const [paymentTerms, setPaymentTerms] = useState('Net 30');
@@ -41,6 +43,21 @@ const InvoiceCreation = () => {
     }
   };
 
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
+  const fetchClients = async () => {
+    try {
+      const q = query(collection(db, 'clients'), orderBy('name'));
+      const querySnapshot = await getDocs(q);
+      const clientsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setClients(clientsData);
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+    }
+  };
+
   // Calculations
   const subtotal = lineItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
   const totalTax = lineItems.reduce((sum, item) => sum + (item.quantity * item.price * (item.tax/100)), 0);
@@ -55,11 +72,19 @@ const InvoiceCreation = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!selectedClient) {
+      setError('Please select a client for this invoice.');
+      return;
+    }
     setSaving(true);
     setError('');
     setSuccess('');
     try {
+      const selectedClientData = clients.find(c => c.id === selectedClient);
       await addDoc(collection(db, 'invoices'), {
+        clientId: selectedClient,
+        clientName: selectedClientData?.name || '',
+        clientEmail: selectedClientData?.email || '',
         lineItems,
         subtotal,
         totalTax,
@@ -74,8 +99,10 @@ const InvoiceCreation = () => {
         recurringStart: isRecurring && recurringStart ? Timestamp.fromDate(new Date(recurringStart)) : null,
         recurringEnd: isRecurring && recurringEnd ? Timestamp.fromDate(new Date(recurringEnd)) : null,
         recurringOccurrences: isRecurring && recurringOccurrences ? Number(recurringOccurrences) : null,
+        status: 'pending'
       });
       setSuccess('Invoice saved successfully!');
+      setSelectedClient('');
       setLineItems([ { ...defaultLine } ]);
       setDiscount(0);
       setPaymentTerms('Net 30');
@@ -119,9 +146,37 @@ const InvoiceCreation = () => {
         </header>
 
         <div className="feature-card" style={{ maxWidth: 'none' }}>
+          {error && <div style={{ padding: '10px', background: '#ffebee', color: '#c62828', borderRadius: '5px', marginBottom: '20px' }}>{error}</div>}
+          {success && <div style={{ padding: '10px', background: '#e8f5e8', color: '#2e7d32', borderRadius: '5px', marginBottom: '20px' }}>{success}</div>}
           <form onSubmit={handleSubmit}>
             <h3 style={{ marginBottom: '20px', color: '#6a11cb' }}>Invoice Details</h3>
             
+            <div style={{ marginBottom: '30px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                Select Client:
+              </label>
+              <select 
+                value={selectedClient} 
+                onChange={e => setSelectedClient(e.target.value)}
+                required
+                style={{ 
+                  width: '100%', 
+                  padding: '10px', 
+                  border: '1px solid #ddd', 
+                  borderRadius: '5px',
+                  fontSize: '14px',
+                  marginBottom: '20px'
+                }}
+              >
+                <option value="">-- Select a client --</option>
+                {clients.map(client => (
+                  <option key={client.id} value={client.id}>
+                    {client.name} ({client.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div style={{ marginBottom: '30px' }}>
               <h4 style={{ marginBottom: '15px', color: '#333' }}>Line Items</h4>
               {lineItems.map((item, idx) => (

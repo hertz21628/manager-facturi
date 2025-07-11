@@ -1,0 +1,361 @@
+.client-profile {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #333;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header h2 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.profile-header p {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.message {
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+}
+
+.message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.profile-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.profile-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-section h3 {
+  margin: 0 0 1.5rem 0;
+  color: #333;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 0.75rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  padding: 0.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  min-width: 0;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+  margin-bottom: 1.5rem;
+}
+
+.address-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  padding: 0.5rem;
+}
+
+.form-group label {
+  margin-bottom: 0.75rem;
+  color: #333;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: white;
+  transition: all 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #6a11cb;
+  box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.1);
+}
+
+.form-group input.disabled {
+  background: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.form-group small {
+  margin-top: 0.25rem;
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.notification-preferences {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.notification-preferences h4 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: #333;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #6a11cb;
+  cursor: pointer;
+}
+
+.profile-actions {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #6a11cb 0%, #667eea 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.save-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(106, 17, 203, 0.3);
+}
+
+.save-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.save-btn i {
+  font-size: 0.9rem;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: white;
+}
+
+/* Dark Theme Styles */
+.dark-theme .client-profile {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+}
+
+.dark-theme .client-header {
+  background: rgba(0, 0, 0, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-theme .client-header h1 {
+  color: #fff;
+}
+
+.dark-theme .client-nav {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.dark-theme .nav-item {
+  color: #ccc;
+}
+
+.dark-theme .nav-item:hover {
+  background: rgba(106, 17, 203, 0.2);
+  color: #fff;
+}
+
+.dark-theme .profile-header,
+.dark-theme .profile-section,
+.dark-theme .profile-actions {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.dark-theme .profile-header h2 {
+  color: #fff;
+}
+
+.dark-theme .profile-header p {
+  color: #ccc;
+}
+
+.dark-theme .profile-section h3 {
+  color: #fff;
+  border-bottom-color: #333;
+}
+
+.dark-theme .form-group label {
+  color: #fff;
+}
+
+.dark-theme .form-group input,
+.dark-theme .form-group select {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #333;
+  color: #fff;
+}
+
+.dark-theme .form-group input:focus,
+.dark-theme .form-group select:focus {
+  border-color: #6a11cb;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.dark-theme .form-group input.disabled {
+  background: rgba(0, 0, 0, 0.3);
+  color: #999;
+}
+
+.dark-theme .form-group small {
+  color: #ccc;
+}
+
+.dark-theme .notification-preferences h4 {
+  color: #fff;
+}
+
+.dark-theme .checkbox-label {
+  color: #fff;
+}
+
+.dark-theme .message.success {
+  background: rgba(40, 167, 69, 0.2);
+  color: #90EE90;
+  border-color: rgba(40, 167, 69, 0.3);
+}
+
+.dark-theme .message.error {
+  background: rgba(220, 53, 69, 0.2);
+  color: #FFB6C1;
+  border-color: rgba(220, 53, 69, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0.25rem;
+  }
+  
+  .address-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0.25rem;
+  }
+  
+  .profile-actions {
+    justify-content: center;
+  }
+  
+  .save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .checkbox-group {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-section {
+    padding: 1.5rem;
+  }
+  
+  .profile-header {
+    padding: 1rem;
+  }
+  
+  .save-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+} 
