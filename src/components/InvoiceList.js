@@ -256,14 +256,14 @@ const InvoiceList = () => {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid #e9ecef' }}>
-                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Invoice #</th>
-                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Description</th>
-                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Amount</th>
-                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Status</th>
-                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Due Date</th>
-                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Payment Terms</th>
-                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Created</th>
-                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Actions</th>
+                    <th className="invoice-th">Invoice #</th>
+                    <th className="invoice-th">Description</th>
+                    <th className="invoice-th">Amount</th>
+                    <th className="invoice-th">Status</th>
+                    <th className="invoice-th">Due Date</th>
+                    <th className="invoice-th">Payment Terms</th>
+                    <th className="invoice-th">Created</th>
+                    <th className="invoice-th">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

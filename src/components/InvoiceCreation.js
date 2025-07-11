@@ -7,6 +7,7 @@ import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import './Dashboard.css';
 
 const defaultLine = { description: '', quantity: 1, price: 0, tax: 0 };
+const currencySymbols = { USD: '$', EUR: '€', RON: 'lei', GBP: '£' };
 
 const InvoiceCreation = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const InvoiceCreation = () => {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [currency, setCurrency] = useState('USD');
 
   const handleLogout = async () => {
     try {
@@ -54,12 +56,14 @@ const InvoiceCreation = () => {
         paymentTerms,
         dueDate: dueDate ? Timestamp.fromDate(new Date(dueDate)) : null,
         createdAt: Timestamp.now(),
+        currency,
       });
       setSuccess('Invoice saved successfully!');
       setLineItems([ { ...defaultLine } ]);
       setDiscount(0);
       setPaymentTerms('Net 30');
       setDueDate('');
+      setCurrency('USD');
     } catch (err) {
       setError('Failed to save invoice.');
     }
@@ -182,6 +186,13 @@ const InvoiceCreation = () => {
                   </button>
                 </div>
               ))}
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 80px 100px 100px 40px', gap: '10px', marginBottom: '10px', alignItems: 'center', fontSize: 13, color: '#888' }}>
+                <div></div>
+                <div><strong>Quantity</strong><br />Number of units/items</div>
+                <div><strong>Price</strong><br />Unit price for each item</div>
+                <div><strong>Tax %</strong><br />Tax rate for this line</div>
+                <div></div>
+              </div>
               <button 
                 type="button" 
                 onClick={addLine} 
@@ -265,6 +276,29 @@ const InvoiceCreation = () => {
               />
             </div>
 
+            <div style={{ marginBottom: '30px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                Currency:
+              </label>
+              <select
+                value={currency}
+                onChange={e => setCurrency(e.target.value)}
+                style={{
+                  width: '200px',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '5px',
+                  fontSize: '14px',
+                  marginBottom: '10px',
+                }}
+              >
+                <option value="USD">US Dollar ($)</option>
+                <option value="EUR">Euro (€)</option>
+                <option value="RON">Romanian Leu (lei)</option>
+                <option value="GBP">British Pound (£)</option>
+              </select>
+            </div>
+
             <div style={{ 
               background: '#f8f9fa', 
               padding: '20px', 
@@ -274,11 +308,11 @@ const InvoiceCreation = () => {
             }}>
               <h4 style={{ marginBottom: '15px', color: '#333' }}>Invoice Summary</h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div>Subtotal: <span style={{ fontWeight: '600' }}>${subtotal.toFixed(2)}</span></div>
-                <div>Tax: <span style={{ fontWeight: '600' }}>${totalTax.toFixed(2)}</span></div>
-                <div>Discount: <span style={{ fontWeight: '600' }}>${Number(discount).toFixed(2)}</span></div>
+                <div>Subtotal: <span style={{ fontWeight: '600' }}>{currencySymbols[currency]}{subtotal.toFixed(2)}</span></div>
+                <div>Tax: <span style={{ fontWeight: '600' }}>{currencySymbols[currency]}{totalTax.toFixed(2)}</span></div>
+                <div>Discount: <span style={{ fontWeight: '600' }}>{currencySymbols[currency]}{Number(discount).toFixed(2)}</span></div>
                 <div style={{ fontSize: '1.2em', fontWeight: '700', color: '#6a11cb' }}>
-                  Total: ${total.toFixed(2)}
+                  Total: {currencySymbols[currency]}{total.toFixed(2)}
                 </div>
               </div>
             </div>

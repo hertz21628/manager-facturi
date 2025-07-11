@@ -11,6 +11,7 @@ import InvoiceList from './components/InvoiceList';
 import ClientManagement from './components/ClientManagement';
 import PDFGeneration from './components/PDFGeneration';
 import Reports from './components/Reports';
+import Settings from './components/Settings';
 import './App.css';
 
 function App() {
@@ -69,6 +70,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Reports />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             }
           />
