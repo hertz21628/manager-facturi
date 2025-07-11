@@ -44,7 +44,13 @@ const resources = {
       'Loading...': 'Loading...',
       'DashboardDesc': 'This is your central hub for managing all your invoicing and client needs. From here, you can create new invoices, manage your client list, and view the status of all your financial documents.',
       'Total Amount': 'Total Amount',
-      'Overdue': 'Overdue'
+      'Overdue': 'Overdue',
+      'InvoiceApp': 'InvoiceApp',
+      'English': 'English',
+      'Romanian': 'Romanian',
+      'German': 'German',
+      'of the interface (where translations are available).': 'of the interface (where translations are available).',
+      'of the website.': 'of the website.'
     }
   },
   ro: {
@@ -89,7 +95,13 @@ const resources = {
       'Loading...': 'Se încarcă...',
       'DashboardDesc': 'Acesta este centrul tău principal pentru gestionarea tuturor nevoilor de facturare și clienți. De aici poți crea facturi noi, gestiona lista de clienți și vizualiza statusul tuturor documentelor financiare.',
       'Total Amount': 'Suma totală',
-      'Overdue': 'Restante'
+      'Overdue': 'Restante',
+      'InvoiceApp': 'Aplicație Facturi',
+      'English': 'Engleză',
+      'Romanian': 'Română',
+      'German': 'Germană',
+      'of the interface (where translations are available).': 'a interfeței (unde sunt disponibile traduceri).',
+      'of the website.': 'a site-ului.'
     }
   },
   de: {
@@ -134,7 +146,13 @@ const resources = {
       'Loading...': 'Wird geladen...',
       'DashboardDesc': 'Dies ist Ihr zentrales Dashboard für die Verwaltung aller Rechnungs- und Kundenanforderungen. Hier können Sie neue Rechnungen erstellen, Ihre Kundenliste verwalten und den Status aller Finanzdokumente einsehen.',
       'Total Amount': 'Gesamtbetrag',
-      'Overdue': 'Überfällig'
+      'Overdue': 'Überfällig',
+      'InvoiceApp': 'RechnungsApp',
+      'English': 'Englisch',
+      'Romanian': 'Rumänisch',
+      'German': 'Deutsch',
+      'of the interface (where translations are available).': 'der Oberfläche (wo Übersetzungen verfügbar sind).',
+      'of the website.': 'der Webseite.'
     }
   }
 };
