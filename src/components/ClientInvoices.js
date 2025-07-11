@@ -26,22 +26,31 @@ const ClientInvoices = () => {
 
   const fetchInvoices = async () => {
     try {
+      console.log('DEBUG: Fetching invoices for clientEmail:', currentUser.email);
       const invoicesRef = collection(db, 'invoices');
+      // TEMP: Fetch all invoices for debugging
+      const allSnapshot = await getDocs(invoicesRef);
+      const allInvoices = [];
+      allSnapshot.forEach((doc) => {
+        allInvoices.push({ id: doc.id, ...doc.data() });
+      });
+      console.log('DEBUG: All invoices:', allInvoices);
+
+      // Remove orderBy for now, just use where
       const q = query(
         invoicesRef,
-        where('clientEmail', '==', currentUser.email),
-        orderBy('date', 'desc')
+        where('clientEmail', '==', currentUser.email)
+        // orderBy('date', 'desc')
       );
       const querySnapshot = await getDocs(q);
-      
       const invoicesData = [];
       querySnapshot.forEach((doc) => {
         invoicesData.push({ id: doc.id, ...doc.data() });
       });
-
+      console.log('DEBUG: Fetched invoices:', invoicesData);
       setInvoices(invoicesData);
     } catch (error) {
-      console.error('Error fetching invoices:', error);
+      console.error('DEBUG: Error fetching invoices:', error);
     } finally {
       setLoading(false);
     }
