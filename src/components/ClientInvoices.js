@@ -5,6 +5,7 @@ import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import ThemeSwitcher from './ThemeSwitcher';
 import './ClientInvoices.css';
+import jsPDF from 'jspdf';
 
 const ClientInvoices = () => {
   const [invoices, setInvoices] = useState([]);
@@ -12,6 +13,8 @@ const ClientInvoices = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
   const { currentUser } = useAuth();
 
   useEffect(() => {
@@ -26,31 +29,28 @@ const ClientInvoices = () => {
 
   const fetchInvoices = async () => {
     try {
-      console.log('DEBUG: Fetching invoices for clientEmail:', currentUser.email);
       const invoicesRef = collection(db, 'invoices');
-      // TEMP: Fetch all invoices for debugging
-      const allSnapshot = await getDocs(invoicesRef);
-      const allInvoices = [];
-      allSnapshot.forEach((doc) => {
-        allInvoices.push({ id: doc.id, ...doc.data() });
-      });
-      console.log('DEBUG: All invoices:', allInvoices);
-
-      // Remove orderBy for now, just use where
       const q = query(
         invoicesRef,
         where('clientEmail', '==', currentUser.email)
-        // orderBy('date', 'desc')
       );
       const querySnapshot = await getDocs(q);
+      
       const invoicesData = [];
       querySnapshot.forEach((doc) => {
         invoicesData.push({ id: doc.id, ...doc.data() });
       });
-      console.log('DEBUG: Fetched invoices:', invoicesData);
-      setInvoices(invoicesData);
+
+      // Sort by date in JavaScript (newest first)
+      const sortedInvoices = invoicesData.sort((a, b) => {
+        const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+        const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+        return dateB - dateA;
+      });
+
+      setInvoices(sortedInvoices);
     } catch (error) {
-      console.error('DEBUG: Error fetching invoices:', error);
+      console.error('Error fetching invoices:', error);
     } finally {
       setLoading(false);
     }
@@ -97,10 +97,59 @@ const ClientInvoices = () => {
   };
 
   const downloadInvoice = (invoice) => {
-    // This would integrate with your PDF generation service
-    console.log('Downloading invoice:', invoice.id);
-    // For now, just show an alert
-    alert('PDF download functionality will be implemented here');
+    const doc = new jsPDF();
+    let y = 15;
+
+    doc.setFontSize(18);
+    doc.text(`Invoice #${invoice.invoiceNumber || ''}`, 14, y);
+    y += 10;
+    doc.setFontSize(12);
+    doc.text(`Client: ${invoice.clientName || ''} (${invoice.clientEmail || ''})`, 14, y);
+    y += 8;
+    doc.text(`Date: ${formatDate(invoice.date)}`, 14, y);
+    y += 8;
+    doc.text(`Due Date: ${formatDate(invoice.dueDate)}`, 14, y);
+    y += 8;
+    doc.text(`Status: ${invoice.status || ''}`, 14, y);
+    y += 8;
+    doc.text(`Currency: ${invoice.currency || ''}`, 14, y);
+    y += 12;
+
+    doc.setFontSize(14);
+    doc.text('Line Items:', 14, y);
+    y += 8;
+    doc.setFontSize(12);
+    invoice.lineItems?.forEach((item, idx) => {
+      doc.text(
+        `${idx + 1}. ${item.description} | Qty: ${item.quantity} | Price: ${formatCurrency(item.price)} | Tax: ${item.tax}%`,
+        16,
+        y
+      );
+      y += 7;
+      if (y > 270) { doc.addPage(); y = 15; }
+    });
+    y += 4;
+    doc.setFontSize(12);
+    doc.text(`Subtotal: ${formatCurrency(invoice.subtotal)}`, 14, y);
+    y += 7;
+    doc.text(`Tax: ${formatCurrency(invoice.totalTax)}`, 14, y);
+    y += 7;
+    doc.text(`Discount: ${formatCurrency(invoice.discount)}`, 14, y);
+    y += 7;
+    doc.setFontSize(14);
+    doc.text(`Total: ${formatCurrency(invoice.total)}`, 14, y);
+
+    doc.save(`Invoice_${invoice.invoiceNumber || invoice.id}.pdf`);
+  };
+
+  const openModal = (invoice) => {
+    setSelectedInvoice(invoice);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedInvoice(null);
   };
 
   if (loading) {
@@ -250,13 +299,13 @@ const ClientInvoices = () => {
                         {formatDate(invoice.dueDate)}
                       </div>
                       <div className="table-cell actions">
-                        <Link 
-                          to={`/client/invoices/${invoice.id}`}
+                        <button 
                           className="action-btn view"
+                          onClick={() => openModal(invoice)}
                         >
                           <i className="fas fa-eye"></i>
                           View
-                        </Link>
+                        </button>
                         <button 
                           onClick={() => downloadInvoice(invoice)}
                           className="action-btn download"
@@ -273,6 +322,33 @@ const ClientInvoices = () => {
           </div>
         </main>
       </div>
+
+      {/* Invoice Modal */}
+      {modalOpen && selectedInvoice && (
+        <div className="invoice-modal-overlay" onClick={closeModal}>
+          <div className="invoice-modal" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeModal}>&times;</button>
+            <h2>Invoice #{selectedInvoice.invoiceNumber}</h2>
+            <p><strong>Client:</strong> {selectedInvoice.clientName} ({selectedInvoice.clientEmail})</p>
+            <p><strong>Date:</strong> {formatDate(selectedInvoice.date)}</p>
+            <p><strong>Due Date:</strong> {formatDate(selectedInvoice.dueDate)}</p>
+            <p><strong>Status:</strong> <span style={{ backgroundColor: getStatusColor(selectedInvoice.status), color: '#fff', padding: '2px 8px', borderRadius: '4px' }}>{selectedInvoice.status}</span></p>
+            <p><strong>Currency:</strong> {selectedInvoice.currency}</p>
+            <h3>Line Items</h3>
+            <ul style={{ paddingLeft: 0 }}>
+              {selectedInvoice.lineItems && selectedInvoice.lineItems.map((item, idx) => (
+                <li key={idx} style={{ marginBottom: '8px', listStyle: 'none', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>
+                  <strong>{item.description}</strong> — Qty: {item.quantity}, Price: {formatCurrency(item.price)}, Tax: {item.tax}%
+                </li>
+              ))}
+            </ul>
+            <p><strong>Subtotal:</strong> {formatCurrency(selectedInvoice.subtotal)}</p>
+            <p><strong>Tax:</strong> {formatCurrency(selectedInvoice.totalTax)}</p>
+            <p><strong>Discount:</strong> {formatCurrency(selectedInvoice.discount)}</p>
+            <p><strong>Total:</strong> <span style={{ fontWeight: 'bold', fontSize: '1.2em' }}>{formatCurrency(selectedInvoice.total)}</span></p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

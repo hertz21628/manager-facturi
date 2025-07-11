@@ -31,9 +31,9 @@ const ClientDashboard = () => {
       const invoicesRef = collection(db, 'invoices');
       const q = query(
         invoicesRef,
-        where('clientEmail', '==', currentUser.email),
-        orderBy('date', 'desc'),
-        limit(5)
+        where('clientEmail', '==', currentUser.email)
+        // orderBy('date', 'desc'),
+        // limit(5)
       );
       const querySnapshot = await getDocs(q);
       
@@ -56,9 +56,18 @@ const ClientDashboard = () => {
         }
       });
 
-      setRecentInvoices(invoices);
+      // Sort by date in JavaScript and limit to 5 most recent
+      const sortedInvoices = invoices
+        .sort((a, b) => {
+          const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+          const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+          return dateB - dateA;
+        })
+        .slice(0, 5);
+
+      setRecentInvoices(sortedInvoices);
       setSummary({
-        totalInvoices: querySnapshot.size,
+        totalInvoices: invoices.length,
         outstandingBalance: totalOutstanding,
         paidInvoices: paidCount,
         overdueInvoices: overdueCount
