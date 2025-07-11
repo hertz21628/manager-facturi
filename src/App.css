@@ -78,6 +78,9 @@ body.dark-theme th, body.dark-theme td {
   border-color: #444;
   color: #f8f8f8;
 }
+body.dark-theme td {
+  color: #111 !important;
+}
 body.dark-theme label,
 body.dark-theme .main-header h1,
 body.dark-theme .main-header p,
@@ -97,6 +100,35 @@ body.dark-theme .feature-card .logout-btn {
 }
 body.dark-theme .feature-card .sidebar-header h2 {
   color: #fff;
+}
+body.dark-theme .feature-card p,
+body.dark-theme .feature-card div,
+body.dark-theme .feature-card label {
+  color: #fff !important;
+}
+body.dark-theme td, body.dark-theme th {
+  color: #fff !important;
+  background: #232526 !important;
+}
+body.dark-theme .feature-card > div {
+  background: #232526 !important;
+  color: #fff !important;
+}
+body.dark-theme .main-content > div,
+body.dark-theme .main-content > div > div {
+  background: #232526 !important;
+  color: #fff !important;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #0006;
+  border: 1px solid #333 !important;
+}
+body.dark-theme .main-content .feature-card > div,
+body.dark-theme .main-content .feature-card > .invoice-summary {
+  background: #232526 !important;
+  color: #fff !important;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #0006;
+  border: 1px solid #333 !important;
 }
 
 .invoice-th {

@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import './Dashboard.css';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -17,12 +19,13 @@ const THEMES = [
 
 const Settings = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'system');
 
   useEffect(() => {
     localStorage.setItem('language', language);
-    // Here you would also update i18n or your translation system
+    i18n.changeLanguage(language);
   }, [language]);
 
   useEffect(() => {
@@ -52,24 +55,24 @@ const Settings = () => {
           <h2>InvoiceApp</h2>
         </div>
         <nav className="sidebar-nav">
-          <Link to="/dashboard" className="nav-link">Dashboard</Link>
-          <Link to="/clients" className="nav-link">Clients</Link>
-          <Link to="/invoices" className="nav-link">Invoices</Link>
-          <Link to="/reports" className="nav-link">Reports</Link>
-          <Link to="/settings" className="nav-link active">Settings</Link>
+          <Link to="/dashboard" className="nav-link">{t('Dashboard')}</Link>
+          <Link to="/clients" className="nav-link">{t('Clients')}</Link>
+          <Link to="/invoices" className="nav-link">{t('Invoices')}</Link>
+          <Link to="/reports" className="nav-link">{t('Reports')}</Link>
+          <Link to="/settings" className="nav-link active">{t('Settings')}</Link>
         </nav>
         <div className="sidebar-footer">
-          <button onClick={handleLogout} className="logout-btn">Logout</button>
+          <button onClick={handleLogout} className="logout-btn">{t('Logout')}</button>
         </div>
       </aside>
       <main className="main-content">
         <header className="main-header">
-          <h1>Settings</h1>
-          <p>Customize your preferences for language and theme.</p>
+          <h1>{t('SettingsTitle')}</h1>
+          <p>{t('SettingsDesc')}</p>
         </header>
         <div className="feature-card" style={{ maxWidth: 500, margin: '0 auto' }}>
           <div style={{ marginBottom: 30 }}>
-            <label style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}>Language</label>
+            <label style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}>{t('Language')}</label>
             <select
               value={language}
               onChange={e => setLanguage(e.target.value)}
@@ -79,18 +82,18 @@ const Settings = () => {
             </select>
           </div>
           <div style={{ marginBottom: 30 }}>
-            <label style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}>Theme</label>
+            <label style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}>{t('Theme')}</label>
             <select
               value={theme}
               onChange={e => setTheme(e.target.value)}
               style={{ width: '100%', padding: 12, borderRadius: 6, border: '1px solid #ddd', fontSize: 16 }}
             >
-              {THEMES.map(t => <option key={t.code} value={t.code}>{t.label}</option>)}
+              {THEMES.map(tOpt => <option key={tOpt.code} value={tOpt.code}>{t(tOpt.label)}</option>)}
             </select>
           </div>
           <div style={{ color: '#888', fontSize: 14 }}>
-            <p><strong>Language:</strong> Changes the language of the interface (where translations are available).</p>
-            <p><strong>Theme:</strong> Switch between light, dark, or system default appearance.</p>
+            <p><strong>{t('Language')}:</strong> {t('Language')} of the interface (where translations are available).</p>
+            <p><strong>{t('Theme')}:</strong> {t('Theme')} of the website.</p>
           </div>
         </div>
       </main>

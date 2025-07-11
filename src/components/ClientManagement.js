@@ -4,6 +4,7 @@ import { signOut } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import './Dashboard.css';
+import { useTranslation } from 'react-i18next';
 
 const initialForm = { name: '', email: '', company: '', phone: '' };
 
@@ -57,6 +58,7 @@ const deleteButtonHoverStyle = {
 
 const ClientManagement = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [clients, setClients] = useState([]);
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
@@ -123,13 +125,13 @@ const ClientManagement = () => {
   };
 
   const handleDelete = async id => {
-    if (!window.confirm('Delete this client?')) return;
+    if (!window.confirm(t('Delete this client?'))) return;
     setDeleting(true);
     try {
       await deleteDoc(doc(db, 'clients', id));
       setClients(clients => clients.filter(c => c.id !== id));
     } catch (error) {
-      alert('Failed to delete client.');
+      alert(t('Failed to delete client.'));
     }
     setDeleting(false);
   };
@@ -154,36 +156,34 @@ const ClientManagement = () => {
           <h2>InvoiceApp</h2>
         </div>
         <nav className="sidebar-nav">
-          <Link to="/dashboard" className="nav-link">Dashboard</Link>
-          <Link to="/clients" className="nav-link active">Clients</Link>
-          <Link to="/invoices" className="nav-link">Invoices</Link>
-          <Link to="/reports" className="nav-link">Reports</Link>
-          <Link to="/settings" className="nav-link">Settings</Link>
+          <Link to="/dashboard" className="nav-link">{t('Dashboard')}</Link>
+          <Link to="/clients" className="nav-link active">{t('Clients')}</Link>
+          <Link to="/invoices" className="nav-link">{t('Invoices')}</Link>
+          <Link to="/reports" className="nav-link">{t('Reports')}</Link>
+          <Link to="/settings" className="nav-link">{t('Settings')}</Link>
         </nav>
         <div className="sidebar-footer">
-          <button onClick={handleLogout} className="logout-btn">
-            Logout
-          </button>
+          <button onClick={handleLogout} className="logout-btn">{t('Logout')}</button>
         </div>
       </aside>
       <main className="main-content">
         <header className="main-header">
-          <h1>Client Management</h1>
-          <p>Add, view, and organize your client information.</p>
+          <h1>{t('Client Management')}</h1>
+          <p>{t('Add, view, and organize your client information.')}</p>
         </header>
         <div className="feature-card" style={{ maxWidth: 'none' }}>
           <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginBottom: 30 }}>
-            <input name="name" value={form.name} onChange={handleInput} placeholder="Full Name" required style={{ flex: 2, minWidth: 120, padding: 10, border: '1px solid #ddd', borderRadius: 5 }} />
-            <input name="email" value={form.email} onChange={handleInput} placeholder="Email" required style={{ flex: 2, minWidth: 120, padding: 10, border: '1px solid #ddd', borderRadius: 5 }} />
-            <input name="company" value={form.company} onChange={handleInput} placeholder="Company" style={{ flex: 2, minWidth: 120, padding: 10, border: '1px solid #ddd', borderRadius: 5 }} />
-            <input name="phone" value={form.phone} onChange={handleInput} placeholder="Phone" style={{ flex: 2, minWidth: 120, padding: 10, border: '1px solid #ddd', borderRadius: 5 }} />
+            <input name="name" value={form.name} onChange={handleInput} placeholder={t('Full Name')} required style={{ flex: 2, minWidth: 120, padding: 10, border: '1px solid #ddd', borderRadius: 5 }} />
+            <input name="email" value={form.email} onChange={handleInput} placeholder={t('Email')} required style={{ flex: 2, minWidth: 120, padding: 10, border: '1px solid #ddd', borderRadius: 5 }} />
+            <input name="company" value={form.company} onChange={handleInput} placeholder={t('Company')} style={{ flex: 2, minWidth: 120, padding: 10, border: '1px solid #ddd', borderRadius: 5 }} />
+            <input name="phone" value={form.phone} onChange={handleInput} placeholder={t('Phone')} style={{ flex: 2, minWidth: 120, padding: 10, border: '1px solid #ddd', borderRadius: 5 }} />
             <button
               type="submit"
               style={editingId ? { ...buttonStyle, ...(addHover ? buttonHoverStyle : {}) } : { ...buttonStyle, ...(addHover ? buttonHoverStyle : {}) }}
               onMouseEnter={() => setAddHover(true)}
               onMouseLeave={() => setAddHover(false)}
             >
-              {editingId ? 'Update' : 'Add'} Client
+              {editingId ? t('Update Client') : t('Add Client')}
             </button>
             {editingId && (
               <button
@@ -193,36 +193,36 @@ const ClientManagement = () => {
                 onMouseEnter={() => setCancelHover(true)}
                 onMouseLeave={() => setCancelHover(false)}
               >
-                Cancel
+                {t('Cancel')}
               </button>
             )}
           </form>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
             <input
               type="text"
-              placeholder="Search clients..."
+              placeholder={t('Search clients...')}
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{ padding: 10, border: '1px solid #ddd', borderRadius: 5, fontSize: 14, minWidth: 200 }}
             />
-            <div style={{ fontWeight: 600, color: '#6a11cb' }}>Total: {filteredClients.length}</div>
+            <div style={{ fontWeight: 600, color: '#6a11cb' }}>{t('Total')}: {filteredClients.length}</div>
           </div>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid #e9ecef' }}>
-                  <th className="invoice-th">Name {sortBy === 'name' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
-                  <th className="invoice-th">Email {sortBy === 'email' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
-                  <th className="invoice-th">Company {sortBy === 'company' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
-                  <th className="invoice-th" onClick={() => handleSort('phone')}>Phone {sortBy === 'phone' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
-                  <th className="invoice-th">Actions</th>
+                  <th className="invoice-th">{t('Name')} {sortBy === 'name' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                  <th className="invoice-th">{t('Email')} {sortBy === 'email' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                  <th className="invoice-th">{t('Company')} {sortBy === 'company' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                  <th className="invoice-th" onClick={() => handleSort('phone')}>{t('Phone')} {sortBy === 'phone' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                  <th className="invoice-th">{t('Actions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={5} style={{ textAlign: 'center', padding: 30 }}>Loading...</td></tr>
+                  <tr><td colSpan={5} style={{ textAlign: 'center', padding: 30 }}>{t('Loading...')}</td></tr>
                 ) : filteredClients.length === 0 ? (
-                  <tr><td colSpan={5} style={{ textAlign: 'center', padding: 30 }}>No clients found.</td></tr>
+                  <tr><td colSpan={5} style={{ textAlign: 'center', padding: 30 }}>{t('No clients found.')}</td></tr>
                 ) : filteredClients.map(client => (
                   <tr key={client.id} style={{ borderBottom: '1px solid #e9ecef', background: '#fff' }}>
                     <td style={{ padding: 15 }}>{client.name}</td>
@@ -236,7 +236,7 @@ const ClientManagement = () => {
                         onMouseEnter={() => setEditHoverId(client.id)}
                         onMouseLeave={() => setEditHoverId(null)}
                       >
-                        Edit
+                        {t('Edit')}
                       </button>
                       <button
                         onClick={() => handleDelete(client.id)}
@@ -245,7 +245,7 @@ const ClientManagement = () => {
                         onMouseEnter={() => setDeleteHoverId(client.id)}
                         onMouseLeave={() => setDeleteHoverId(null)}
                       >
-                        Delete
+                        {t('Delete')}
                       </button>
                     </td>
                   </tr>

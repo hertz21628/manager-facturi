@@ -2,29 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../firebase';
-import { collection, getDocs, query, orderBy, deleteDoc, doc, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
 import './Dashboard.css';
+import { useTranslation } from 'react-i18next';
 
 const InvoiceList = () => {
-  const navigate = useNavigate();
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
       navigate('/login');
     } catch (error) {
-      console.error("Error signing out:", error);
+      console.error('Error signing out:', error);
     }
   };
 
   useEffect(() => {
     fetchInvoices();
-    // eslint-disable-next-line
   }, []);
 
   const fetchInvoices = async () => {
@@ -32,48 +33,38 @@ const InvoiceList = () => {
     try {
       const q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
-      const invoicesData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate(),
-        dueDate: doc.data().dueDate?.toDate()
-      }));
+      const invoicesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setInvoices(invoicesData);
     } catch (error) {
       console.error('Error fetching invoices:', error);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
-  const handleDeleteInvoice = async (invoiceId) => {
-    if (!window.confirm('Are you sure you want to delete this invoice?')) return;
+  const handleDelete = async (invoiceId) => {
+    if (!window.confirm(t('Are you sure you want to delete this invoice?'))) return;
     setDeleting(true);
     try {
       await deleteDoc(doc(db, 'invoices', invoiceId));
       setInvoices(invoices => invoices.filter(inv => inv.id !== invoiceId));
-    } catch (error) {
-      alert('Failed to delete invoice.');
+    } finally {
+      setDeleting(false);
     }
-    setDeleting(false);
   };
 
   const handleDeleteAll = async () => {
-    if (!window.confirm('Are you sure you want to delete ALL invoices? This cannot be undone.')) return;
+    if (!window.confirm(t('Are you sure you want to delete ALL invoices? This cannot be undone.'))) return;
     setDeleting(true);
     try {
       const q = query(collection(db, 'invoices'));
       const querySnapshot = await getDocs(q);
-      const batch = writeBatch(db);
-      querySnapshot.forEach(docSnap => {
-        batch.delete(doc(db, 'invoices', docSnap.id));
-      });
-      await batch.commit();
+      for (const docSnap of querySnapshot.docs) {
+        await deleteDoc(doc(db, 'invoices', docSnap.id));
+      }
       setInvoices([]);
-    } catch (error) {
-      alert('Failed to delete all invoices.');
+    } finally {
+      setDeleting(false);
     }
-    setDeleting(false);
   };
 
   const getStatusColor = (invoice) => {
@@ -115,6 +106,11 @@ const InvoiceList = () => {
 
   const formatDate = (date) => {
     if (!date) return 'N/A';
+    // If Firestore Timestamp, convert to Date
+    if (date.toDate) date = date.toDate();
+    // If string, try to convert to Date
+    if (!(date instanceof Date)) date = new Date(date);
+    if (isNaN(date)) return 'N/A';
     return date.toLocaleDateString();
   };
 
@@ -133,21 +129,19 @@ const InvoiceList = () => {
             <h2>InvoiceApp</h2>
           </div>
           <nav className="sidebar-nav">
-            <Link to="/dashboard" className="nav-link">Dashboard</Link>
-            <Link to="/clients" className="nav-link">Clients</Link>
-            <Link to="/invoices" className="nav-link active">Invoices</Link>
-            <Link to="/reports" className="nav-link">Reports</Link>
-            <Link to="/settings" className="nav-link">Settings</Link>
+            <Link to="/dashboard" className="nav-link">{t('Dashboard')}</Link>
+            <Link to="/clients" className="nav-link">{t('Clients')}</Link>
+            <Link to="/invoices" className="nav-link active">{t('Invoices')}</Link>
+            <Link to="/reports" className="nav-link">{t('Reports')}</Link>
+            <Link to="/settings" className="nav-link">{t('Settings')}</Link>
           </nav>
           <div className="sidebar-footer">
-            <button onClick={handleLogout} className="logout-btn">
-              Logout
-            </button>
+            <button onClick={handleLogout} className="logout-btn">{t('Logout')}</button>
           </div>
         </aside>
         <main className="main-content">
           <div style={{ textAlign: 'center', padding: '50px' }}>
-            <h2>Loading invoices...</h2>
+            <h2>{t('Loading invoices...')}</h2>
           </div>
         </main>
       </div>
@@ -161,23 +155,21 @@ const InvoiceList = () => {
           <h2>InvoiceApp</h2>
         </div>
         <nav className="sidebar-nav">
-          <Link to="/dashboard" className="nav-link">Dashboard</Link>
-          <Link to="/clients" className="nav-link">Clients</Link>
-          <Link to="/invoices" className="nav-link active">Invoices</Link>
-          <Link to="/reports" className="nav-link">Reports</Link>
-          <Link to="/settings" className="nav-link">Settings</Link>
+          <Link to="/dashboard" className="nav-link">{t('Dashboard')}</Link>
+          <Link to="/clients" className="nav-link">{t('Clients')}</Link>
+          <Link to="/invoices" className="nav-link active">{t('Invoices')}</Link>
+          <Link to="/reports" className="nav-link">{t('Reports')}</Link>
+          <Link to="/settings" className="nav-link">{t('Settings')}</Link>
         </nav>
         <div className="sidebar-footer">
-          <button onClick={handleLogout} className="logout-btn">
-            Logout
-          </button>
+          <button onClick={handleLogout} className="logout-btn">{t('Logout')}</button>
         </div>
       </aside>
       
       <main className="main-content">
         <header className="main-header">
-          <h1>Invoice List & Status</h1>
-          <p>Track the status of all your invoices, from sent to paid.</p>
+          <h1>{t('Invoice List & Status')}</h1>
+          <p>{t('Track the status of all your invoices, from sent to paid.')}</p>
         </header>
 
         <div className="feature-card" style={{ maxWidth: 'none' }}>
@@ -206,10 +198,10 @@ const InvoiceList = () => {
                   fontSize: '14px'
                 }}
               >
-                <option value="all">All Invoices</option>
-                <option value="overdue">Overdue</option>
-                <option value="due-soon">Due Soon</option>
-                <option value="on-track">On Track</option>
+                <option value="all">{t('All Invoices')}</option>
+                <option value="overdue">{t('Overdue')}</option>
+                <option value="due-soon">{t('Due Soon')}</option>
+                <option value="on-track">{t('On Track')}</option>
               </select>
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
@@ -225,7 +217,7 @@ const InvoiceList = () => {
                   fontWeight: '600'
                 }}
               >
-                + Create New Invoice
+                {t('+ Create New Invoice')}
               </Link>
               <button
                 onClick={handleDeleteAll}
@@ -241,15 +233,15 @@ const InvoiceList = () => {
                   cursor: deleting || invoices.length === 0 ? 'not-allowed' : 'pointer'
                 }}
               >
-                Delete All
+                {t('Delete All')}
               </button>
             </div>
           </div>
 
           {filteredInvoices.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-              <h3>No invoices found</h3>
-              <p>Create your first invoice to get started.</p>
+              <h3>{t('No invoices found')}</h3>
+              <p>{t('Create your first invoice to get started.')}</p>
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
@@ -279,7 +271,7 @@ const InvoiceList = () => {
                         INV-{invoice.id.slice(-8).toUpperCase()}
                       </td>
                       <td style={{ padding: '15px' }}>
-                        {invoice.lineItems?.[0]?.description || 'No description'}
+                        {invoice.lineItems?.[0]?.description || t('No description')}
                         {invoice.lineItems?.length > 1 && ` +${invoice.lineItems.length - 1} more items`}
                       </td>
                       <td style={{ padding: '15px', fontWeight: '600' }}>
@@ -301,14 +293,14 @@ const InvoiceList = () => {
                         {formatDate(invoice.dueDate)}
                       </td>
                       <td style={{ padding: '15px' }}>
-                        {invoice.paymentTerms || 'N/A'}
+                        {invoice.paymentTerms || t('N/A')}
                       </td>
                       <td style={{ padding: '15px' }}>
                         {formatDate(invoice.createdAt)}
                       </td>
                       <td style={{ padding: '15px' }}>
                         <button
-                          onClick={() => handleDeleteInvoice(invoice.id)}
+                          onClick={() => handleDelete(invoice.id)}
                           disabled={deleting}
                           style={{
                             padding: '8px 14px',
@@ -321,7 +313,7 @@ const InvoiceList = () => {
                             cursor: deleting ? 'not-allowed' : 'pointer'
                           }}
                         >
-                          Delete
+                          {t('Delete')}
                         </button>
                       </td>
                     </tr>
@@ -331,16 +323,16 @@ const InvoiceList = () => {
             </div>
           )}
 
-          <div style={{ marginTop: '20px', padding: '15px', background: '#f8f9fa', borderRadius: '5px', border: '1px solid #e9ecef' }}>
+          <div className="invoice-summary" style={{ marginTop: '20px', padding: '15px', background: '#f8f9fa', borderRadius: '5px', border: '1px solid #e9ecef' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
               <div>
-                <strong>Total Invoices:</strong> {filteredInvoices.length}
+                <strong>{t('Total Invoices')}:</strong> {filteredInvoices.length}
               </div>
               <div>
-                <strong>Total Amount:</strong> {formatCurrency(filteredInvoices.reduce((sum, invoice) => sum + (invoice.total || 0), 0))}
+                <strong>{t('Total Amount')}:</strong> {formatCurrency(filteredInvoices.reduce((sum, invoice) => sum + (invoice.total || 0), 0))}
               </div>
               <div>
-                <strong>Overdue:</strong> {filteredInvoices.filter(invoice => getStatusText(invoice) === 'Overdue').length}
+                <strong>{t('Overdue')}:</strong> {filteredInvoices.filter(invoice => getStatusText(invoice) === 'Overdue').length}
               </div>
             </div>
           </div>
