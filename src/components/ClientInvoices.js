@@ -327,7 +327,6 @@ const ClientInvoices = () => {
                     <div key={invoice.id} className="table-row">
                       <div className="table-cell invoice-number">
                         <strong>#{invoice.invoiceNumber}</strong>
-                        <small>{invoice.clientName}</small>
                       </div>
                       <div className="table-cell">
                         {formatDate(invoice.date)}

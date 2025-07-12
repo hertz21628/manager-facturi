@@ -44,7 +44,7 @@ const Login = () => {
         if (role === 'admin') {
           console.log('Admin login successful, navigating to dashboard');
           // Admin login successful
-          navigate('/dashboard');
+      navigate('/dashboard');
         } else {
           console.log('User role is not admin:', role);
           // Client trying to access admin portal

@@ -12,6 +12,15 @@ const ClientPayments = () => {
   const [loading, setLoading] = useState(true);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({
+    paymentMethod: 'credit-card',
+    cardNumber: '',
+    expiryDate: '',
+    cvv: '',
+    cardholderName: ''
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [isProcessing, setIsProcessing] = useState(false);
   const { currentUser } = useAuth();
 
   useEffect(() => {
@@ -87,32 +96,97 @@ const ClientPayments = () => {
   const handleMakePayment = (invoice) => {
     setSelectedInvoice(invoice);
     setShowPaymentModal(true);
+    // Reset form when opening modal
+    setPaymentForm({
+      paymentMethod: 'credit-card',
+      cardNumber: '',
+      expiryDate: '',
+      cvv: '',
+      cardholderName: ''
+    });
+    setFormErrors({});
+    setIsProcessing(false);
   };
 
-  const handlePaymentSubmit = async (paymentData) => {
+  const validateForm = () => {
+    const errors = {};
+    
+    // Card number validation (basic 16-digit format)
+    if (!paymentForm.cardNumber.trim()) {
+      errors.cardNumber = 'Card number is required';
+    } else if (!/^\d{4}\s\d{4}\s\d{4}\s\d{4}$/.test(paymentForm.cardNumber.trim())) {
+      errors.cardNumber = 'Please enter a valid 16-digit card number';
+    }
+    
+    // Expiry date validation (MM/YY format)
+    if (!paymentForm.expiryDate.trim()) {
+      errors.expiryDate = 'Expiry date is required';
+    } else if (!/^\d{2}\/\d{2}$/.test(paymentForm.expiryDate.trim())) {
+      errors.expiryDate = 'Please enter expiry date in MM/YY format';
+    } else {
+      const [month, year] = paymentForm.expiryDate.split('/');
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear() % 100;
+      const currentMonth = currentDate.getMonth() + 1;
+      
+      if (parseInt(month) < 1 || parseInt(month) > 12) {
+        errors.expiryDate = 'Invalid month';
+      } else if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+        errors.expiryDate = 'Card has expired';
+      }
+    }
+    
+    // CVV validation (3-4 digits)
+    if (!paymentForm.cvv.trim()) {
+      errors.cvv = 'CVV is required';
+    } else if (!/^\d{3,4}$/.test(paymentForm.cvv.trim())) {
+      errors.cvv = 'Please enter a valid 3 or 4 digit CVV';
+    }
+    
+    // Cardholder name validation
+    if (!paymentForm.cardholderName.trim()) {
+      errors.cardholderName = 'Cardholder name is required';
+    } else if (paymentForm.cardholderName.trim().length < 2) {
+      errors.cardholderName = 'Please enter a valid name';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handlePaymentSubmit = async () => {
+    if (!validateForm()) {
+      return;
+    }
+    
+    setIsProcessing(true);
+    
     // This would integrate with a payment processor like Stripe
-    console.log('Processing payment:', paymentData);
+    console.log('Processing payment:', paymentForm);
     
     // Mock payment processing
     setTimeout(async () => {
       try {
         // Mark invoice as completed in Firestore
-        const invoiceRef = doc(db, 'invoices', paymentData.id);
+        const invoiceRef = doc(db, 'invoices', selectedInvoice.id);
         await updateDoc(invoiceRef, { 
           status: 'completed',
           paidAt: new Date(),
-          paymentMethod: 'Credit Card' // This would come from the form
+          paymentMethod: paymentForm.paymentMethod === 'credit-card' ? 'Credit Card' : 
+                        paymentForm.paymentMethod === 'debit-card' ? 'Debit Card' : 'Bank Transfer'
         });
         
         alert('Payment processed successfully!');
         setShowPaymentModal(false);
         setSelectedInvoice(null);
+        setIsProcessing(false);
         
         // Refresh data to show updated status
         await fetchData();
       } catch (err) {
         console.error('Error updating invoice status:', err);
         alert('Error processing payment. Please try again.');
+        setIsProcessing(false);
       }
     }, 2000);
   };
@@ -204,10 +278,10 @@ const ClientPayments = () => {
               </div>
             ) : (
               <div className="invoice-grid">
-                {outstandingInvoices.map((invoice) => (
+                {outstandingInvoices.map((invoice, index) => (
                   <div key={invoice.id} className="invoice-card">
                     <div className="invoice-header">
-                      <h4>Invoice #{invoice.invoiceNumber}</h4>
+                      <h4>Invoice #{invoice.invoiceNumber || (index + 1)}</h4>
                       <span 
                         className="status-badge"
                         style={{ backgroundColor: getStatusColor(invoice.status) }}
@@ -248,9 +322,11 @@ const ClientPayments = () => {
             ) : (
               <div className="payments-table">
                 <div className="table-header">
-                  <div className="header-cell">Date</div>
+                  <div className="header-cell">Payment Date</div>
                   <div className="header-cell">Invoice #</div>
-                  <div className="header-cell">Amount</div>
+                  <div className="header-cell">Client</div>
+                  <div className="header-cell">Total Amount</div>
+                  <div className="header-cell">Payment Method</div>
                   <div className="header-cell">Status</div>
                 </div>
                 <div className="table-body">
@@ -258,12 +334,18 @@ const ClientPayments = () => {
                     const dateA = a.paidAt?.toDate ? a.paidAt.toDate() : (a.date?.toDate ? a.date.toDate() : new Date(a.date));
                     const dateB = b.paidAt?.toDate ? b.paidAt.toDate() : (b.date?.toDate ? b.date.toDate() : new Date(b.date));
                     return dateB - dateA;
-                  }).map((inv) => (
+                  }).map((inv, index) => (
                     <div key={inv.id} className="table-row">
-                      <div className="table-cell">{formatDate(inv.paidAt || inv.date)}</div>
-                      <div className="table-cell">{inv.invoiceNumber}</div>
-                      <div className="table-cell">{formatCurrency(inv.total)}</div>
-                      <div className="table-cell">
+                      <div className="table-cell" data-label="Payment Date">{formatDate(inv.paidAt || inv.date)}</div>
+                      <div className="table-cell" data-label="Invoice #">{inv.invoiceNumber || (index + 1)}</div>
+                      <div className="table-cell" data-label="Client">
+                        <strong>{inv.clientName}</strong>
+                      </div>
+                      <div className="table-cell amount" data-label="Total Amount">
+                        <strong>{formatCurrency(inv.total)}</strong>
+                      </div>
+                      <div className="table-cell" data-label="Payment Method">{inv.paymentMethod || 'Credit Card'}</div>
+                      <div className="table-cell" data-label="Status">
                         <span className="status-badge" style={{ backgroundColor: getStatusColor(inv.status) }}>{inv.status}</span>
                       </div>
                     </div>
@@ -299,7 +381,10 @@ const ClientPayments = () => {
               <div className="payment-form">
                 <div className="form-group">
                   <label>Payment Method</label>
-                  <select defaultValue="credit-card">
+                  <select 
+                    value={paymentForm.paymentMethod}
+                    onChange={(e) => setPaymentForm({...paymentForm, paymentMethod: e.target.value})}
+                  >
                     <option value="credit-card">Credit Card</option>
                     <option value="debit-card">Debit Card</option>
                     <option value="bank-transfer">Bank Transfer</option>
@@ -308,31 +393,60 @@ const ClientPayments = () => {
 
                 <div className="form-group">
                   <label>Card Number</label>
-                  <input type="text" placeholder="1234 5678 9012 3456" />
+                  <input 
+                    type="text" 
+                    placeholder="1234 5678 9012 3456" 
+                    value={paymentForm.cardNumber}
+                    onChange={(e) => setPaymentForm({...paymentForm, cardNumber: e.target.value})}
+                    className={formErrors.cardNumber ? 'error' : ''}
+                  />
+                  {formErrors.cardNumber && <span className="error-message">{formErrors.cardNumber}</span>}
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
                     <label>Expiry Date</label>
-                    <input type="text" placeholder="MM/YY" />
+                    <input 
+                      type="text" 
+                      placeholder="MM/YY" 
+                      value={paymentForm.expiryDate}
+                      onChange={(e) => setPaymentForm({...paymentForm, expiryDate: e.target.value})}
+                      className={formErrors.expiryDate ? 'error' : ''}
+                    />
+                    {formErrors.expiryDate && <span className="error-message">{formErrors.expiryDate}</span>}
                   </div>
                   <div className="form-group">
                     <label>CVV</label>
-                    <input type="text" placeholder="123" />
+                    <input 
+                      type="text" 
+                      placeholder="123" 
+                      value={paymentForm.cvv}
+                      onChange={(e) => setPaymentForm({...paymentForm, cvv: e.target.value})}
+                      className={formErrors.cvv ? 'error' : ''}
+                    />
+                    {formErrors.cvv && <span className="error-message">{formErrors.cvv}</span>}
                   </div>
                 </div>
 
                 <div className="form-group">
                   <label>Name on Card</label>
-                  <input type="text" placeholder="John Doe" />
+                  <input 
+                    type="text" 
+                    placeholder="John Doe" 
+                    value={paymentForm.cardholderName}
+                    onChange={(e) => setPaymentForm({...paymentForm, cardholderName: e.target.value})}
+                    className={formErrors.cardholderName ? 'error' : ''}
+                  />
+                  {formErrors.cardholderName && <span className="error-message">{formErrors.cardholderName}</span>}
                 </div>
 
                 <button 
-                  onClick={() => handlePaymentSubmit(selectedInvoice)}
+                  onClick={handlePaymentSubmit}
                   className="process-payment-btn"
+                  disabled={isProcessing}
                 >
                   <i className="fas fa-lock"></i>
-                  Process Payment
+                  {isProcessing ? 'Processing...' : 'Process Payment'}
                 </button>
               </div>
             </div>

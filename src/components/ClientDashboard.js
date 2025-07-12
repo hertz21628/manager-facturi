@@ -195,10 +195,10 @@ const ClientDashboard = () => {
                 </div>
               ) : (
                 <div className="invoice-list">
-                  {recentInvoices.map((invoice) => (
+                  {recentInvoices.map((invoice, index) => (
                     <div key={invoice.id} className="invoice-item">
                       <div className="invoice-info">
-                        <h4>Invoice #{invoice.invoiceNumber}</h4>
+                        <h4>Invoice {index + 1}</h4>
                         <p className="invoice-date">
                           {new Date(invoice.date?.toDate()).toLocaleDateString()}
                         </p>
