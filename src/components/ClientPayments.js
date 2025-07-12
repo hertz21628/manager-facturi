@@ -6,6 +6,13 @@ import { useAuth } from '../context/AuthContext';
 import ThemeSwitcher from './ThemeSwitcher';
 import './ClientPayments.css';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
+
+const LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'ro', label: 'Romanian' },
+  { code: 'de', label: 'German' },
+];
 
 const ClientPayments = () => {
   const [invoices, setInvoices] = useState([]);
@@ -22,6 +29,7 @@ const ClientPayments = () => {
   });
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
   const { currentUser } = useAuth();
   const { t } = useTranslation();
 
@@ -30,6 +38,11 @@ const ClientPayments = () => {
       fetchData();
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    localStorage.setItem('language', language);
+    i18n.changeLanguage(language);
+  }, [language]);
 
   const fetchData = async () => {
     try {
@@ -215,7 +228,7 @@ const ClientPayments = () => {
   if (loading) {
     return (
       <div className="client-payments">
-        <div className="loading">Loading payments...</div>
+        <div className="loading">{t('Loading payments...')}</div>
       </div>
     );
   }
@@ -227,6 +240,17 @@ const ClientPayments = () => {
           <h1>{t('Payments')}</h1>
           <div className="header-actions">
             <ThemeSwitcher />
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="language-selector"
+            >
+              {LANGUAGES.map(l => (
+                <option key={l.code} value={l.code}>
+                  {t(l.label)}
+                </option>
+              ))}
+            </select>
             <Link to="/client/dashboard" className="back-btn">
               <i className="fas fa-arrow-left"></i>
               {t('Back to Dashboard')}

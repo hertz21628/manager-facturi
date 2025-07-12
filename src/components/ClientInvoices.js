@@ -8,6 +8,13 @@ import './ClientInvoices.css';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
+
+const LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'ro', label: 'Romanian' },
+  { code: 'de', label: 'German' },
+];
 
 const currencySymbols = { USD: '$', EUR: '€', RON: 'lei', GBP: '£' };
 
@@ -19,6 +26,7 @@ const ClientInvoices = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
   const { currentUser } = useAuth();
   const { t } = useTranslation();
 
@@ -27,6 +35,11 @@ const ClientInvoices = () => {
       fetchInvoices();
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    localStorage.setItem('language', language);
+    i18n.changeLanguage(language);
+  }, [language]);
 
   useEffect(() => {
     filterInvoices();
@@ -83,6 +96,7 @@ const ClientInvoices = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'paid': return '#28a745';
+      case 'completed': return '#28a745';
       case 'pending': return '#ffc107';
       case 'overdue': return '#dc3545';
       default: return '#6c757d';
@@ -222,7 +236,7 @@ const ClientInvoices = () => {
   if (loading) {
     return (
       <div className="client-invoices">
-        <div className="loading">Loading invoices...</div>
+        <div className="loading">{t('Loading invoices...')}</div>
       </div>
     );
   }
@@ -234,6 +248,17 @@ const ClientInvoices = () => {
           <h1>{t('My Invoices')}</h1>
           <div className="header-actions">
             <ThemeSwitcher />
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="language-selector"
+            >
+              {LANGUAGES.map(l => (
+                <option key={l.code} value={l.code}>
+                  {t(l.label)}
+                </option>
+              ))}
+            </select>
             <Link to="/client/dashboard" className="back-btn">
               <i className="fas fa-arrow-left"></i>
               {t('Back to Dashboard')}

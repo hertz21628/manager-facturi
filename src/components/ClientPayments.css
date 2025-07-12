@@ -461,6 +461,40 @@
   color: #fff;
 }
 
+/* Language Selector Styles */
+.language-selector {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  cursor: pointer;
+  min-width: 120px;
+  color: #333;
+}
+
+.language-selector:focus {
+  outline: none;
+  border-color: #6a11cb;
+  box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.1);
+}
+
+.dark-theme .language-selector {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #333;
+  color: #fff;
+}
+
+.dark-theme .language-selector:focus {
+  border-color: #6a11cb;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.dark-theme .language-selector option {
+  background: #2a2a2a;
+  color: #fff;
+}
+
 .dark-theme .summary-card,
 .dark-theme .outstanding-invoices,
 .dark-theme .payment-history {

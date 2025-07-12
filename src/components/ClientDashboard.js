@@ -108,6 +108,7 @@ const ClientDashboard = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'paid': return '#28a745';
+      case 'completed': return '#28a745';
       case 'pending': return '#ffc107';
       case 'overdue': return '#dc3545';
       default: return '#6c757d';
@@ -156,7 +157,7 @@ const ClientDashboard = () => {
   if (loading) {
     return (
       <div className="client-dashboard">
-        <div className="loading">Loading...</div>
+        <div className="loading">{t('Loading...')}</div>
       </div>
     );
   }
@@ -172,15 +173,7 @@ const ClientDashboard = () => {
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
-              style={{
-                padding: '0.5rem 0.75rem',
-                border: '1px solid #ddd',
-                borderRadius: '6px',
-                fontSize: '0.9rem',
-                background: 'white',
-                cursor: 'pointer',
-                minWidth: '120px'
-              }}
+              className="language-selector"
             >
               {LANGUAGES.map(l => (
                 <option key={l.code} value={l.code}>
@@ -260,7 +253,7 @@ const ClientDashboard = () => {
                           className="status-badge"
                           style={{ backgroundColor: getStatusColor(invoice.status) }}
                         >
-                          {invoice.status}
+                          {t(invoice.status)}
                         </span>
                         <button 
                           className="action-btn view"
@@ -310,7 +303,7 @@ const ClientDashboard = () => {
             <p><strong>{t('Client')}:</strong> {selectedInvoice.clientName} ({selectedInvoice.clientEmail})</p>
             <p><strong>{t('Date')}:</strong> {formatDate(selectedInvoice.paidAt || selectedInvoice.date)}</p>
             <p><strong>{t('Due Date')}:</strong> {formatDate(selectedInvoice.dueDate)}</p>
-            <p><strong>{t('Status')}:</strong> <span style={{ backgroundColor: getStatusColor(selectedInvoice.status), color: '#fff', padding: '2px 8px', borderRadius: '4px' }}>{selectedInvoice.status}</span></p>
+            <p><strong>{t('Status')}:</strong> <span style={{ backgroundColor: getStatusColor(selectedInvoice.status), color: '#fff', padding: '2px 8px', borderRadius: '4px' }}>{t(selectedInvoice.status)}</span></p>
             <p><strong>{t('Currency')}:</strong> {selectedInvoice.currency}</p>
             <h3>{t('Line Items')}</h3>
             <ul style={{ paddingLeft: 0 }}>

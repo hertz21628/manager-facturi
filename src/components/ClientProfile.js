@@ -7,6 +7,13 @@ import { useAuth } from '../context/AuthContext';
 import ThemeSwitcher from './ThemeSwitcher';
 import './ClientProfile.css';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
+
+const LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'ro', label: 'Romanian' },
+  { code: 'de', label: 'German' },
+];
 
 const ClientProfile = () => {
   const { currentUser } = useAuth();
@@ -14,6 +21,7 @@ const ClientProfile = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
   const { t } = useTranslation();
   
   const [profile, setProfile] = useState({
@@ -45,6 +53,11 @@ const ClientProfile = () => {
       loadProfile();
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    localStorage.setItem('language', language);
+    i18n.changeLanguage(language);
+  }, [language]);
 
   const loadProfile = async () => {
     try {
@@ -164,6 +177,17 @@ const ClientProfile = () => {
           <h1>{t('My Profile')}</h1>
           <div className="header-actions">
             <ThemeSwitcher />
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="language-selector"
+            >
+              {LANGUAGES.map(l => (
+                <option key={l.code} value={l.code}>
+                  {t(l.label)}
+                </option>
+              ))}
+            </select>
             <Link to="/client/dashboard" className="back-btn">
               <i className="fas fa-arrow-left"></i>
               {t('Back to Dashboard')}

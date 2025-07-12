@@ -4,6 +4,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import './Register.css';
+import { useTranslation } from 'react-i18next';
 
 const ClientRegister = () => {
   const [name, setName] = useState('');
@@ -11,6 +12,7 @@ const ClientRegister = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -37,29 +39,29 @@ const ClientRegister = () => {
   return (
     <div className="register-container">
       <div className="register-info">
-        <h1>Client Portal Registration</h1>
-        <p>Sign up to access your invoices, payment history, and update your profile.</p>
+        <h1>{t('Client Portal Registration')}</h1>
+        <p>{t('Sign up to access your invoices, payment history, and update your profile.')}</p>
       </div>
       <div className="register-form-container">
-        <h2>Create Your Client Account</h2>
+        <h2>{t('Create Your Client Account')}</h2>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <form onSubmit={handleRegister}>
           <div className="form-group">
-            <label htmlFor="name">Full Name</label>
+            <label htmlFor="name">{t('Full Name')}</label>
             <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">{t('Email Address')}</label>
             <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t('Password')}</label>
             <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
-          <button type="submit" className="register-button">Sign Up</button>
+          <button type="submit" className="register-button">{t('Sign Up')}</button>
         </form>
         <div className="login-link">
-          <p>Already have a client account? <Link to="/client/login">Log In</Link></p>
+          <p>{t('Already have a client account?')} <Link to="/client/login">{t('Log In')}</Link></p>
         </div>
       </div>
     </div>
