@@ -16,6 +16,8 @@ const ClientDashboard = () => {
     overdueInvoices: 0
   });
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
@@ -102,6 +104,21 @@ const ClientDashboard = () => {
       style: 'currency',
       currency: 'USD'
     }).format(amount || 0);
+  };
+
+  const formatDate = (date) => {
+    if (!date) return 'N/A';
+    return new Date(date.toDate()).toLocaleDateString();
+  };
+
+  const openModal = (invoice) => {
+    setSelectedInvoice(invoice);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedInvoice(null);
   };
 
   if (loading) {
@@ -194,9 +211,13 @@ const ClientDashboard = () => {
                         >
                           {invoice.status}
                         </span>
-                        <Link to={`/client/invoices/${invoice.id}`} className="view-btn">
+                        <button 
+                          className="action-btn view"
+                          onClick={() => openModal(invoice)}
+                        >
+                          <i className="fas fa-eye"></i>
                           View
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -228,6 +249,33 @@ const ClientDashboard = () => {
           </div>
         </main>
       </div>
+
+      {/* Invoice Modal */}
+      {modalOpen && selectedInvoice && (
+        <div className="invoice-modal-overlay" onClick={closeModal}>
+          <div className="invoice-modal" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeModal}>&times;</button>
+            <h2>Invoice #{selectedInvoice.invoiceNumber}</h2>
+            <p><strong>Client:</strong> {selectedInvoice.clientName} ({selectedInvoice.clientEmail})</p>
+            <p><strong>Date:</strong> {formatDate(selectedInvoice.date)}</p>
+            <p><strong>Due Date:</strong> {formatDate(selectedInvoice.dueDate)}</p>
+            <p><strong>Status:</strong> <span style={{ backgroundColor: getStatusColor(selectedInvoice.status), color: '#fff', padding: '2px 8px', borderRadius: '4px' }}>{selectedInvoice.status}</span></p>
+            <p><strong>Currency:</strong> {selectedInvoice.currency}</p>
+            <h3>Line Items</h3>
+            <ul style={{ paddingLeft: 0 }}>
+              {selectedInvoice.lineItems && selectedInvoice.lineItems.map((item, idx) => (
+                <li key={idx} style={{ marginBottom: '8px', listStyle: 'none', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>
+                  <strong>{item.description}</strong> — Qty: {item.quantity}, Price: {formatCurrency(item.price)}, Tax: {item.tax}%
+                </li>
+              ))}
+            </ul>
+            <p><strong>Subtotal:</strong> {formatCurrency(selectedInvoice.subtotal)}</p>
+            <p><strong>Tax:</strong> {formatCurrency(selectedInvoice.totalTax)}</p>
+            <p><strong>Discount:</strong> {formatCurrency(selectedInvoice.discount)}</p>
+            <p><strong>Total:</strong> <span style={{ fontWeight: 'bold', fontSize: '1.2em' }}>{formatCurrency(selectedInvoice.total)}</span></p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

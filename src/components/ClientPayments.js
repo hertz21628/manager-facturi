@@ -45,29 +45,9 @@ const ClientPayments = () => {
 
       setInvoices(sortedInvoices);
 
-      // Fetch payment history (mock data for now)
-      const mockPayments = [
-        {
-          id: '1',
-          invoiceNumber: 'INV-001',
-          amount: 1500.00,
-          date: new Date('2024-01-15'),
-          method: 'Credit Card',
-          status: 'completed',
-          reference: 'TXN-123456'
-        },
-        {
-          id: '2',
-          invoiceNumber: 'INV-002',
-          amount: 750.00,
-          date: new Date('2024-01-10'),
-          method: 'Bank Transfer',
-          status: 'completed',
-          reference: 'TXN-123457'
-        }
-      ];
-
-      setPayments(mockPayments);
+      // Use real completed invoices for payment history instead of mock data
+      const completedInvoices = sortedInvoices.filter(inv => inv.status === 'completed');
+      setPayments(completedInvoices);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -115,20 +95,25 @@ const ClientPayments = () => {
     
     // Mock payment processing
     setTimeout(async () => {
-      alert('Payment processed successfully!');
-      setShowPaymentModal(false);
-      setSelectedInvoice(null);
-      // Mark invoice as completed in Firestore
-      if (paymentData.invoiceId) {
-        try {
-          const invoiceRef = doc(db, 'invoices', paymentData.invoiceId);
-          await updateDoc(invoiceRef, { status: 'completed' });
-        } catch (err) {
-          console.error('Error updating invoice status:', err);
-        }
+      try {
+        // Mark invoice as completed in Firestore
+        const invoiceRef = doc(db, 'invoices', paymentData.id);
+        await updateDoc(invoiceRef, { 
+          status: 'completed',
+          paidAt: new Date(),
+          paymentMethod: 'Credit Card' // This would come from the form
+        });
+        
+        alert('Payment processed successfully!');
+        setShowPaymentModal(false);
+        setSelectedInvoice(null);
+        
+        // Refresh data to show updated status
+        await fetchData();
+      } catch (err) {
+        console.error('Error updating invoice status:', err);
+        alert('Error processing payment. Please try again.');
       }
-      // Refresh data
-      fetchData();
     }, 2000);
   };
 
@@ -190,16 +175,16 @@ const ClientPayments = () => {
             </div>
             <div className="summary-card">
               <h3>Total Paid</h3>
-              <p className="summary-amount paid">{formatCurrency(payments.reduce((sum, p) => sum + p.amount, 0))}</p>
+              <p className="summary-amount paid">{formatCurrency(payments.reduce((sum, p) => sum + (p.total || 0), 0))}</p>
               <span className="summary-label">{payments.length} payments made</span>
             </div>
             <div className="summary-card">
               <h3>Last Payment</h3>
               <p className="summary-amount">
-                {payments.length > 0 ? formatCurrency(payments[0].amount) : '$0.00'}
+                {payments.length > 0 ? formatCurrency(payments[0].total || 0) : '$0.00'}
               </p>
               <span className="summary-label">
-                {payments.length > 0 ? formatDate(payments[0].date) : 'No payments yet'}
+                {payments.length > 0 ? formatDate(payments[0].paidAt || payments[0].date) : 'No payments yet'}
               </span>
             </div>
           </div>
@@ -270,12 +255,12 @@ const ClientPayments = () => {
                 </div>
                 <div className="table-body">
                   {completedInvoices.sort((a, b) => {
-                    const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
-                    const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+                    const dateA = a.paidAt?.toDate ? a.paidAt.toDate() : (a.date?.toDate ? a.date.toDate() : new Date(a.date));
+                    const dateB = b.paidAt?.toDate ? b.paidAt.toDate() : (b.date?.toDate ? b.date.toDate() : new Date(b.date));
                     return dateB - dateA;
                   }).map((inv) => (
                     <div key={inv.id} className="table-row">
-                      <div className="table-cell">{formatDate(inv.date)}</div>
+                      <div className="table-cell">{formatDate(inv.paidAt || inv.date)}</div>
                       <div className="table-cell">{inv.invoiceNumber}</div>
                       <div className="table-cell">{formatCurrency(inv.total)}</div>
                       <div className="table-cell">

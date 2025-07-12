@@ -448,4 +448,142 @@
   .invoice-status {
     align-items: flex-start;
   }
+}
+
+/* Action Button Styles */
+.action-btn.view {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s;
+  background: #6a11cb;
+  color: white;
+}
+
+.action-btn.view:hover {
+  background: #5a0db1;
+}
+
+/* Modal Styles */
+.invoice-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: modalIn 0.3s ease-out;
+}
+
+.invoice-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 450px;
+  width: 90%;
+  max-height: 70vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.modal-close:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.invoice-modal h2 {
+  margin: 0 0 0.75rem 0;
+  color: #6a11cb;
+  font-size: 1.3rem;
+}
+
+.invoice-modal h3 {
+  margin: 1rem 0 0.75rem 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.invoice-modal p {
+  margin: 0.4rem 0;
+  color: #666;
+  line-height: 1.4;
+  font-size: 0.9rem;
+}
+
+.invoice-modal ul {
+  margin: 0.75rem 0;
+}
+
+.invoice-modal li {
+  margin-bottom: 0.4rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Dark theme modal styles */
+.dark-theme .invoice-modal {
+  background: #2a2a2a;
+  color: #e0e0e0;
+}
+
+.dark-theme .invoice-modal h2 {
+  color: #6a11cb;
+}
+
+.dark-theme .invoice-modal h3 {
+  color: #fff;
+}
+
+.dark-theme .invoice-modal p {
+  color: #ccc;
+}
+
+.dark-theme .invoice-modal li {
+  color: #ccc;
+}
+
+.dark-theme .modal-close {
+  color: #ccc;
+}
+
+.dark-theme .modal-close:hover {
+  background: #444;
+  color: #fff;
 } 

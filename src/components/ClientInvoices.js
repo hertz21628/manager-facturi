@@ -6,6 +6,9 @@ import { useAuth } from '../context/AuthContext';
 import ThemeSwitcher from './ThemeSwitcher';
 import './ClientInvoices.css';
 import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+const currencySymbols = { USD: '$', EUR: '€', RON: 'lei', GBP: '£' };
 
 const ClientInvoices = () => {
   const [invoices, setInvoices] = useState([]);
@@ -98,48 +101,93 @@ const ClientInvoices = () => {
 
   const downloadInvoice = (invoice) => {
     const doc = new jsPDF();
-    let y = 15;
-
-    doc.setFontSize(18);
-    doc.text(`Invoice #${invoice.invoiceNumber || ''}`, 14, y);
-    y += 10;
+    const symbol = currencySymbols[invoice.currency || 'USD'] || '$';
+    
+    // Header
+    doc.setFontSize(22);
+    doc.setTextColor(106, 17, 203);
+    doc.text('INVOICE', 14, 20);
     doc.setFontSize(12);
-    doc.text(`Client: ${invoice.clientName || ''} (${invoice.clientEmail || ''})`, 14, y);
-    y += 8;
-    doc.text(`Date: ${formatDate(invoice.date)}`, 14, y);
-    y += 8;
-    doc.text(`Due Date: ${formatDate(invoice.dueDate)}`, 14, y);
-    y += 8;
-    doc.text(`Status: ${invoice.status || ''}`, 14, y);
-    y += 8;
-    doc.text(`Currency: ${invoice.currency || ''}`, 14, y);
-    y += 12;
-
-    doc.setFontSize(14);
-    doc.text('Line Items:', 14, y);
-    y += 8;
+    doc.setTextColor(40, 40, 40);
+    doc.text(`Invoice #: INV-${invoice.id.slice(-8).toUpperCase()}`, 14, 30);
+    doc.text(`Date: ${formatDate(invoice.date)}`, 14, 38);
+    doc.text(`Due Date: ${formatDate(invoice.dueDate)}`, 14, 46);
+    doc.text(`Payment Terms: ${invoice.paymentTerms || 'N/A'}`, 14, 54);
+    doc.text(`Currency: ${invoice.currency || 'USD'}`, 14, 62);
+    
+    // Company Info (placeholder)
+    doc.setFontSize(11);
+    doc.setTextColor(80, 80, 80);
+    doc.text('Your Company Name', 150, 20);
+    doc.text('Address Line 1', 150, 26);
+    doc.text('Address Line 2', 150, 32);
+    doc.text('Email: company@email.com', 150, 38);
+    doc.text('Phone: +123456789', 150, 44);
+    
+    // Client Info
     doc.setFontSize(12);
-    invoice.lineItems?.forEach((item, idx) => {
-      doc.text(
-        `${idx + 1}. ${item.description} | Qty: ${item.quantity} | Price: ${formatCurrency(item.price)} | Tax: ${item.tax}%`,
-        16,
-        y
-      );
-      y += 7;
-      if (y > 270) { doc.addPage(); y = 15; }
+    doc.setTextColor(40, 40, 40);
+    doc.text('Bill To:', 14, 74);
+    doc.setFontSize(11);
+    doc.setTextColor(80, 80, 80);
+    let clientY = 80;
+    if (invoice.clientName) {
+      doc.text(invoice.clientName, 14, clientY); clientY += 6;
+    }
+    if (invoice.clientEmail) {
+      doc.text(invoice.clientEmail, 14, clientY); clientY += 6;
+    }
+    if (invoice.clientCompany) {
+      doc.text(invoice.clientCompany, 14, clientY); clientY += 6;
+    }
+    
+    // Table
+    const tableY = Math.max(clientY, 92);
+    const tableData = invoice.lineItems?.map(item => [
+      item.description,
+      item.quantity,
+      symbol + parseFloat(item.price).toFixed(2),
+      `${item.tax}%`,
+      symbol + (item.quantity * item.price * (item.tax/100)).toFixed(2),
+      symbol + (item.quantity * item.price + item.quantity * item.price * (item.tax/100)).toFixed(2)
+    ]) || [];
+    
+    autoTable(doc, {
+      head: [['Description', 'Qty', 'Price', 'Tax', 'Tax Amt', 'Line Total']],
+      body: tableData,
+      startY: tableY,
+      theme: 'striped',
+      headStyles: { fillColor: [106, 17, 203], textColor: 255, fontSize: 11 },
+      bodyStyles: { fontSize: 10 },
+      alternateRowStyles: { fillColor: [245, 245, 255] },
+      styles: { cellPadding: 3 },
+      margin: { left: 14, right: 14 },
     });
-    y += 4;
+    
+    // Summary
+    let summaryY = doc.lastAutoTable.finalY + 10;
     doc.setFontSize(12);
-    doc.text(`Subtotal: ${formatCurrency(invoice.subtotal)}`, 14, y);
-    y += 7;
-    doc.text(`Tax: ${formatCurrency(invoice.totalTax)}`, 14, y);
-    y += 7;
-    doc.text(`Discount: ${formatCurrency(invoice.discount)}`, 14, y);
-    y += 7;
-    doc.setFontSize(14);
-    doc.text(`Total: ${formatCurrency(invoice.total)}`, 14, y);
-
-    doc.save(`Invoice_${invoice.invoiceNumber || invoice.id}.pdf`);
+    doc.setTextColor(40, 40, 40);
+    doc.text('Summary', 150, summaryY);
+    doc.setFontSize(11);
+    doc.setTextColor(80, 80, 80);
+    summaryY += 6;
+    doc.text(`Subtotal: ${symbol}${(invoice.subtotal || 0).toFixed(2)}`, 150, summaryY);
+    summaryY += 6;
+    doc.text(`Tax: ${symbol}${(invoice.totalTax || 0).toFixed(2)}`, 150, summaryY);
+    summaryY += 6;
+    doc.text(`Discount: ${symbol}${(invoice.discount || 0).toFixed(2)}`, 150, summaryY);
+    summaryY += 6;
+    doc.setFontSize(13);
+    doc.setTextColor(106, 17, 203);
+    doc.text(`Total: ${symbol}${(invoice.total || 0).toFixed(2)}`, 150, summaryY);
+    
+    // Footer/Notes
+    doc.setFontSize(10);
+    doc.setTextColor(120, 120, 120);
+    doc.text('Thank you for your business!', 14, 285);
+    
+    doc.save(`invoice_${invoice.id.slice(-8)}.pdf`);
   };
 
   const openModal = (invoice) => {
