@@ -123,7 +123,24 @@ const ClientDashboard = () => {
 
   const formatDate = (date) => {
     if (!date) return 'N/A';
-    return new Date(date.toDate()).toLocaleDateString();
+    
+    try {
+      // Handle Firestore Timestamp
+      if (date.toDate && typeof date.toDate === 'function') {
+        return date.toDate().toLocaleDateString();
+      }
+      
+      // Handle regular Date object
+      if (date instanceof Date) {
+        return date.toLocaleDateString();
+      }
+      
+      // Handle string or timestamp
+      return new Date(date).toLocaleDateString();
+    } catch (error) {
+      console.error('Error formatting date:', error, date);
+      return 'N/A';
+    }
   };
 
   const openModal = (invoice) => {
@@ -232,9 +249,9 @@ const ClientDashboard = () => {
                   {recentInvoices.map((invoice, index) => (
                     <div key={invoice.id} className="invoice-item">
                       <div className="invoice-info">
-                        <h4>{t('Invoice')} {index + 1}</h4>
+                        <h4>{t('Invoice')} INV-{invoice.id.slice(-8).toUpperCase()}</h4>
                         <p className="invoice-date">
-                          {new Date(invoice.date?.toDate()).toLocaleDateString()}
+                          {formatDate(invoice.paidAt || invoice.date)}
                         </p>
                         <p className="invoice-amount">{formatCurrency(invoice.total)}</p>
                       </div>
@@ -289,9 +306,9 @@ const ClientDashboard = () => {
         <div className="invoice-modal-overlay" onClick={closeModal}>
           <div className="invoice-modal" onClick={e => e.stopPropagation()}>
             <button className="modal-close" onClick={closeModal}>&times;</button>
-            <h2>{t('Invoice')} #{selectedInvoice.invoiceNumber}</h2>
+            <h2>{t('Invoice')} INV-{selectedInvoice.id.slice(-8).toUpperCase()}</h2>
             <p><strong>{t('Client')}:</strong> {selectedInvoice.clientName} ({selectedInvoice.clientEmail})</p>
-            <p><strong>{t('Date')}:</strong> {formatDate(selectedInvoice.date)}</p>
+            <p><strong>{t('Date')}:</strong> {formatDate(selectedInvoice.paidAt || selectedInvoice.date)}</p>
             <p><strong>{t('Due Date')}:</strong> {formatDate(selectedInvoice.dueDate)}</p>
             <p><strong>{t('Status')}:</strong> <span style={{ backgroundColor: getStatusColor(selectedInvoice.status), color: '#fff', padding: '2px 8px', borderRadius: '4px' }}>{selectedInvoice.status}</span></p>
             <p><strong>{t('Currency')}:</strong> {selectedInvoice.currency}</p>

@@ -89,10 +89,24 @@ const ClientPayments = () => {
 
   const formatDate = (date) => {
     if (!date) return 'N/A';
-    if (date instanceof Date) {
-      return date.toLocaleDateString();
+    
+    try {
+      // Handle Firestore Timestamp
+      if (date.toDate && typeof date.toDate === 'function') {
+        return date.toDate().toLocaleDateString();
+      }
+      
+      // Handle regular Date object
+      if (date instanceof Date) {
+        return date.toLocaleDateString();
+      }
+      
+      // Handle string or timestamp
+      return new Date(date).toLocaleDateString();
+    } catch (error) {
+      console.error('Error formatting date:', error, date);
+      return 'N/A';
     }
-    return new Date(date.toDate()).toLocaleDateString();
   };
 
   const handleMakePayment = (invoice) => {
@@ -283,7 +297,7 @@ const ClientPayments = () => {
                 {outstandingInvoices.map((invoice, index) => (
                   <div key={invoice.id} className="invoice-card">
                     <div className="invoice-header">
-                      <h4>{t('Invoice')} #{invoice.invoiceNumber || (index + 1)}</h4>
+                      <h4>{t('Invoice')} INV-{invoice.id.slice(-8).toUpperCase()}</h4>
                       <span 
                         className="status-badge"
                         style={{ backgroundColor: getStatusColor(invoice.status) }}
@@ -339,7 +353,7 @@ const ClientPayments = () => {
                   }).map((inv, index) => (
                     <div key={inv.id} className="table-row">
                       <div className="table-cell" data-label={t('Payment Date')}>{formatDate(inv.paidAt || inv.date)}</div>
-                      <div className="table-cell" data-label={t('Invoice #')}>{inv.invoiceNumber || (index + 1)}</div>
+                      <div className="table-cell" data-label={t('Invoice #')}>INV-{inv.id.slice(-8).toUpperCase()}</div>
                       <div className="table-cell" data-label={t('Client')}>
                         <strong>{inv.clientName}</strong>
                       </div>
@@ -375,7 +389,7 @@ const ClientPayments = () => {
             
             <div className="modal-content">
               <div className="invoice-summary">
-                <h4>{t('Invoice')} #{selectedInvoice.invoiceNumber}</h4>
+                <h4>{t('Invoice')} INV-{selectedInvoice.id.slice(-8).toUpperCase()}</h4>
                 <p className="amount">{formatCurrency(selectedInvoice.total)}</p>
                 <p className="due-date">{t('Due')}: {formatDate(selectedInvoice.dueDate)}</p>
               </div>

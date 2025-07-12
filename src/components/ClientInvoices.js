@@ -98,7 +98,24 @@ const ClientInvoices = () => {
 
   const formatDate = (date) => {
     if (!date) return 'N/A';
-    return new Date(date.toDate()).toLocaleDateString();
+    
+    try {
+      // Handle Firestore Timestamp
+      if (date.toDate && typeof date.toDate === 'function') {
+        return date.toDate().toLocaleDateString();
+      }
+      
+      // Handle regular Date object
+      if (date instanceof Date) {
+        return date.toLocaleDateString();
+      }
+      
+      // Handle string or timestamp
+      return new Date(date).toLocaleDateString();
+    } catch (error) {
+      console.error('Error formatting date:', error, date);
+      return 'N/A';
+    }
   };
 
   const downloadInvoice = (invoice) => {
@@ -112,7 +129,7 @@ const ClientInvoices = () => {
     doc.setFontSize(12);
     doc.setTextColor(40, 40, 40);
     doc.text(`Invoice #: INV-${invoice.id.slice(-8).toUpperCase()}`, 14, 30);
-    doc.text(`Date: ${formatDate(invoice.date)}`, 14, 38);
+    doc.text(`Date: ${formatDate(invoice.paidAt || invoice.date)}`, 14, 38);
     doc.text(`Due Date: ${formatDate(invoice.dueDate)}`, 14, 46);
     doc.text(`Payment Terms: ${invoice.paymentTerms || 'N/A'}`, 14, 54);
     doc.text(`Currency: ${invoice.currency || 'USD'}`, 14, 62);
@@ -317,7 +334,7 @@ const ClientInvoices = () => {
               <div className="invoices-table">
                 <div className="table-header">
                   <div className="header-cell">{t('Invoice #')}</div>
-                  <div className="header-cell">{t('Date')}</div>
+                  <div className="header-cell">{t('Payment Date')}</div>
                   <div className="header-cell">{t('Amount')}</div>
                   <div className="header-cell">{t('Status')}</div>
                   <div className="header-cell">{t('Due Date')}</div>
@@ -328,10 +345,10 @@ const ClientInvoices = () => {
                   {filteredInvoices.map((invoice) => (
                     <div key={invoice.id} className="table-row">
                       <div className="table-cell invoice-number">
-                        <strong>#{invoice.invoiceNumber}</strong>
+                        <strong>INV-{invoice.id.slice(-8).toUpperCase()}</strong>
                       </div>
                       <div className="table-cell">
-                        {formatDate(invoice.date)}
+                        {formatDate(invoice.paidAt || invoice.date)}
                       </div>
                       <div className="table-cell amount">
                         <strong>{formatCurrency(invoice.total)}</strong>
@@ -377,9 +394,9 @@ const ClientInvoices = () => {
         <div className="invoice-modal-overlay" onClick={closeModal}>
           <div className="invoice-modal" onClick={e => e.stopPropagation()}>
             <button className="modal-close" onClick={closeModal}>&times;</button>
-            <h2>{t('Invoice')} #{selectedInvoice.invoiceNumber}</h2>
+            <h2>{t('Invoice')} INV-{selectedInvoice.id.slice(-8).toUpperCase()}</h2>
             <p><strong>{t('Client')}:</strong> {selectedInvoice.clientName} ({selectedInvoice.clientEmail})</p>
-            <p><strong>{t('Date')}:</strong> {formatDate(selectedInvoice.date)}</p>
+            <p><strong>{t('Date')}:</strong> {formatDate(selectedInvoice.paidAt || selectedInvoice.date)}</p>
             <p><strong>{t('Due Date')}:</strong> {formatDate(selectedInvoice.dueDate)}</p>
             <p><strong>{t('Status')}:</strong> <span style={{ backgroundColor: getStatusColor(selectedInvoice.status), color: '#fff', padding: '2px 8px', borderRadius: '4px' }}>{t(selectedInvoice.status)}</span></p>
             <p><strong>{t('Currency')}:</strong> {selectedInvoice.currency}</p>
