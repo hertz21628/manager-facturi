@@ -378,6 +378,10 @@
   color: #fff;
 }
 
+.dark-theme .quick-actions h2 {
+  color: #fff;
+}
+
 .dark-theme .section-header p {
   color: #ccc;
 }

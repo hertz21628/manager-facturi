@@ -521,6 +521,10 @@
   background: rgba(106, 17, 203, 0.1);
 }
 
+.dark-theme .table-cell strong {
+  color: #ccc;
+}
+
 .dark-theme .payment-modal {
   background: #1a1a2e;
   color: #e0e0e0;

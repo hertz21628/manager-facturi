@@ -361,6 +361,11 @@
   border-color: #6a11cb;
 }
 
+.dark-theme .status-filter option {
+  background: #2a2a2a;
+  color: #fff;
+}
+
 .dark-theme .summary-item {
   background: rgba(0, 0, 0, 0.8);
   color: #e0e0e0;
