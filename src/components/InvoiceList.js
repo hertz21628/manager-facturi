@@ -5,6 +5,7 @@ import { auth, db } from '../firebase';
 import { collection, getDocs, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
 import './Dashboard.css';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '../utils/currency';
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState([]);
@@ -114,11 +115,8 @@ const InvoiceList = () => {
     return date.toLocaleDateString();
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+  const formatCurrencyAmount = (amount, currencyCode = 'USD') => {
+    return formatCurrency(amount, currencyCode);
   };
 
   if (loading) {
@@ -275,7 +273,7 @@ const InvoiceList = () => {
                         {invoice.lineItems?.length > 1 && ` +${invoice.lineItems.length - 1} more items`}
                       </td>
                       <td style={{ padding: '15px', fontWeight: '600' }}>
-                        {formatCurrency(invoice.total || 0)}
+                        {formatCurrencyAmount(invoice.total || 0, invoice.currency)}
                       </td>
                       <td style={{ padding: '15px' }}>
                         <span style={{
@@ -329,7 +327,7 @@ const InvoiceList = () => {
                 <strong>{t('Total Invoices')}:</strong> {filteredInvoices.length}
               </div>
               <div>
-                <strong>{t('Total Amount')}:</strong> {formatCurrency(filteredInvoices.reduce((sum, invoice) => sum + (invoice.total || 0), 0))}
+                <strong>{t('Total Amount')}:</strong> {formatCurrencyAmount(filteredInvoices.reduce((sum, invoice) => sum + (invoice.total || 0), 0))}
               </div>
               <div>
                 <strong>{t('Overdue')}:</strong> {filteredInvoices.filter(invoice => getStatusText(invoice) === 'Overdue').length}

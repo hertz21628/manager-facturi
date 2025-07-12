@@ -7,8 +7,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import './Dashboard.css';
 import { useTranslation } from 'react-i18next';
-
-const currencySymbols = { USD: '$', EUR: '€', RON: 'lei', GBP: '£' };
+import { getCurrencySymbol } from '../utils/currency';
 
 const PDFGeneration = () => {
   const navigate = useNavigate();
@@ -51,16 +50,16 @@ const PDFGeneration = () => {
     return date.toLocaleDateString();
   };
 
-  const formatCurrency = (amount) => {
+  const formatCurrencyAmount = (amount, currencyCode = 'USD') => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: currencyCode
     }).format(amount);
   };
 
   const generatePDF = (invoice) => {
     const doc = new jsPDF();
-    const symbol = currencySymbols[invoice.currency || 'USD'] || '$';
+    const symbol = getCurrencySymbol(invoice.currency || 'USD');
     // Header
     doc.setFontSize(22);
     doc.setTextColor(106, 17, 203);
@@ -186,7 +185,7 @@ const PDFGeneration = () => {
                     <tr key={invoice.id} style={{ borderBottom: '1px solid #e9ecef', background: index % 2 === 0 ? '#f8f9fa' : 'white' }}>
                       <td style={{ padding: 15, fontWeight: 600, color: '#6a11cb' }}>INV-{invoice.id.slice(-8).toUpperCase()}</td>
                       <td style={{ padding: 15 }}>{invoice.lineItems?.[0]?.description || t('No description')}{invoice.lineItems?.length > 1 && ` +${invoice.lineItems.length - 1} more items`}</td>
-                      <td style={{ padding: 15, fontWeight: 600 }}>{formatCurrency(invoice.total || 0)}</td>
+                      <td style={{ padding: 15, fontWeight: 600 }}>{formatCurrencyAmount(invoice.total || 0, invoice.currency)}</td>
                       <td style={{ padding: 15 }}>{formatDate(invoice.createdAt)}</td>
                       <td style={{ padding: 15 }}>
                         <button

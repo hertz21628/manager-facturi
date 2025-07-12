@@ -163,6 +163,19 @@
   color: #ffc107;
 }
 
+/* Multi-currency display styles */
+.summary-number.outstanding div,
+.summary-number.paid div {
+  margin-bottom: 4px;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.summary-number.outstanding div:last-child,
+.summary-number.paid div:last-child {
+  margin-bottom: 0;
+}
+
 .dashboard-content {
   display: grid;
   grid-template-columns: 2fr 1fr;

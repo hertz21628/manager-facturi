@@ -7,6 +7,7 @@ import ThemeSwitcher from './ThemeSwitcher';
 import './ClientPayments.css';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
+import { formatCurrency } from '../utils/currency';
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -93,11 +94,8 @@ const ClientPayments = () => {
     }
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount || 0);
+  const formatCurrencyAmount = (amount, currencyCode = 'USD') => {
+    return formatCurrency(amount || 0, currencyCode);
   };
 
   const formatDate = (date) => {
@@ -223,7 +221,18 @@ const ClientPayments = () => {
   // Use real completed invoices for payment history
   const outstandingInvoices = invoices.filter(inv => inv.status !== 'completed');
   const completedInvoices = invoices.filter(inv => inv.status === 'completed');
-  const totalOutstanding = outstandingInvoices.reduce((sum, inv) => sum + (inv.total || 0), 0);
+  
+  // Calculate outstanding amounts by currency
+  const outstandingByCurrency = {};
+  outstandingInvoices.forEach(inv => {
+    const currency = inv.currency || 'USD';
+    const amount = inv.total || 0;
+    
+    if (!outstandingByCurrency[currency]) {
+      outstandingByCurrency[currency] = 0;
+    }
+    outstandingByCurrency[currency] += amount;
+  });
 
   if (loading) {
     return (
@@ -282,21 +291,46 @@ const ClientPayments = () => {
         <main className="client-main">
           {/* Payment Summary */}
           <div className="payment-summary">
-            <div className="summary-card">
-              <h3>{t('Outstanding Balance')}</h3>
-              <p className="summary-amount outstanding">{formatCurrency(totalOutstanding)}</p>
-              <span className="summary-label">{outstandingInvoices.length} {t('invoices pending')}</span>
-            </div>
-            <div className="summary-card">
-              <h3>{t('Total Paid')}</h3>
-              <p className="summary-amount paid">{formatCurrency(payments.reduce((sum, p) => sum + (p.total || 0), 0))}</p>
-              <span className="summary-label">{payments.length} {t('payments made')}</span>
-            </div>
+                          <div className="summary-card">
+                <h3>{t('Outstanding Balance')}</h3>
+                <div className="summary-amount outstanding">
+                  {Object.entries(outstandingByCurrency).map(([currency, amount]) => (
+                    <div key={currency} style={{ marginBottom: '4px' }}>
+                      {formatCurrencyAmount(amount, currency)}
+                    </div>
+                  ))}
+                </div>
+                <span className="summary-label">{outstandingInvoices.length} {t('invoices pending')}</span>
+              </div>
+                          <div className="summary-card">
+                <h3>{t('Total Paid')}</h3>
+                <div className="summary-amount paid">
+                  {(() => {
+                    const paidByCurrency = {};
+                    payments.forEach(p => {
+                      const currency = p.currency || 'USD';
+                      const amount = p.total || 0;
+                      
+                      if (!paidByCurrency[currency]) {
+                        paidByCurrency[currency] = 0;
+                      }
+                      paidByCurrency[currency] += amount;
+                    });
+                    
+                    return Object.entries(paidByCurrency).map(([currency, amount]) => (
+                      <div key={currency} style={{ marginBottom: '4px' }}>
+                        {formatCurrencyAmount(amount, currency)}
+                      </div>
+                    ));
+                  })()}
+                </div>
+                <span className="summary-label">{payments.length} {t('payments made')}</span>
+              </div>
             <div className="summary-card">
               <h3>{t('Last Payment')}</h3>
-              <p className="summary-amount">
-                {payments.length > 0 ? formatCurrency(payments[0].total || 0) : '$0.00'}
-              </p>
+              <div className="summary-amount">
+                {payments.length > 0 ? formatCurrencyAmount(payments[0].total || 0, payments[0].currency) : '$0.00'}
+              </div>
               <span className="summary-label">
                 {payments.length > 0 ? formatDate(payments[0].paidAt || payments[0].date) : t('No payments yet')}
               </span>
@@ -331,7 +365,7 @@ const ClientPayments = () => {
                     </div>
                     <div className="invoice-details">
                       <p className="invoice-date">{t('Due')}: {formatDate(invoice.dueDate)}</p>
-                      <p className="invoice-amount">{formatCurrency(invoice.total)}</p>
+                      <p className="invoice-amount">{formatCurrencyAmount(invoice.total, invoice.currency)}</p>
                     </div>
                     <button 
                       onClick={() => handleMakePayment(invoice)}
@@ -382,7 +416,7 @@ const ClientPayments = () => {
                         <strong>{inv.clientName}</strong>
                       </div>
                       <div className="table-cell amount" data-label={t('Total Amount')}>
-                        <strong>{formatCurrency(inv.total)}</strong>
+                        <strong>{formatCurrencyAmount(inv.total, inv.currency)}</strong>
                       </div>
                       <div className="table-cell" data-label={t('Payment Method')}>{inv.paymentMethod || t('Credit Card')}</div>
                       <div className="table-cell" data-label={t('Status')}>
@@ -414,7 +448,7 @@ const ClientPayments = () => {
             <div className="modal-content">
               <div className="invoice-summary">
                 <h4>{t('Invoice')} INV-{selectedInvoice.id.slice(-8).toUpperCase()}</h4>
-                <p className="amount">{formatCurrency(selectedInvoice.total)}</p>
+                <p className="amount">{formatCurrencyAmount(selectedInvoice.total, selectedInvoice.currency)}</p>
                 <p className="due-date">{t('Due')}: {formatDate(selectedInvoice.dueDate)}</p>
               </div>
 

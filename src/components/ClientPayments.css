@@ -55,6 +55,19 @@
   color: #28a745;
 }
 
+/* Multi-currency display styles */
+.summary-amount.outstanding div,
+.summary-amount.paid div {
+  margin-bottom: 4px;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.summary-amount.outstanding div:last-child,
+.summary-amount.paid div:last-child {
+  margin-bottom: 0;
+}
+
 .summary-label {
   color: #666;
   font-size: 0.85rem;

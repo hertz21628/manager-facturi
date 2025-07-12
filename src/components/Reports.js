@@ -7,6 +7,7 @@ import { Bar, Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
 import './Dashboard.css';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '../utils/currency';
 
 Chart.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -172,11 +173,11 @@ const Reports = () => {
         <div style={{ display: 'flex', gap: 30, flexWrap: 'wrap', marginBottom: 30 }}>
           <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #0001', padding: 24, minWidth: 220, flex: 1 }}>
             <div style={{ fontSize: 15, color: '#888', marginBottom: 6 }}>{t('Total Revenue')}</div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#6a11cb' }}>{totalRevenue.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#6a11cb' }}>{formatCurrency(totalRevenue, 'USD')}</div>
           </div>
           <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #0001', padding: 24, minWidth: 220, flex: 1 }}>
             <div style={{ fontSize: 15, color: '#888', marginBottom: 6 }}>{t('Outstanding')}</div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#ff4757' }}>{outstanding.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#ff4757' }}>{formatCurrency(outstanding, 'USD')}</div>
           </div>
           <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #0001', padding: 24, minWidth: 220, flex: 1 }}>
             <div style={{ fontSize: 15, color: '#888', marginBottom: 6 }}>{t('Total Invoices')}</div>
@@ -184,7 +185,7 @@ const Reports = () => {
           </div>
           <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #0001', padding: 24, minWidth: 220, flex: 1 }}>
             <div style={{ fontSize: 15, color: '#888', marginBottom: 6 }}>{t('Total Tax Collected')}</div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#2575fc' }}>{totalTax.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#2575fc' }}>{formatCurrency(totalTax, 'USD')}</div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 30, flexWrap: 'wrap', marginBottom: 30 }}>
@@ -247,7 +248,7 @@ const Reports = () => {
                   Object.entries(outstandingByClient).map(([client, amt]) => (
                     <tr key={client} style={{ borderBottom: '1px solid #e9ecef' }}>
                       <td style={{ padding: 10 }}>{client}</td>
-                      <td style={{ padding: 10, color: '#ff4757', fontWeight: 600 }}>{amt.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+                      <td style={{ padding: 10, color: '#ff4757', fontWeight: 600 }}>{formatCurrency(amt, 'USD')}</td>
                     </tr>
                   ))
                 )}

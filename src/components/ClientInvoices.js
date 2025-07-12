@@ -9,14 +9,13 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
+import { formatCurrency, getCurrencySymbol } from '../utils/currency';
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
   { code: 'ro', label: 'Romanian' },
   { code: 'de', label: 'German' },
 ];
-
-const currencySymbols = { USD: '$', EUR: '€', RON: 'lei', GBP: '£' };
 
 const ClientInvoices = () => {
   const [invoices, setInvoices] = useState([]);
@@ -103,11 +102,8 @@ const ClientInvoices = () => {
     }
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount || 0);
+  const formatCurrencyAmount = (amount, currencyCode = 'USD') => {
+    return formatCurrency(amount || 0, currencyCode);
   };
 
   const formatDate = (date) => {
@@ -134,7 +130,7 @@ const ClientInvoices = () => {
 
   const downloadInvoice = (invoice) => {
     const doc = new jsPDF();
-    const symbol = currencySymbols[invoice.currency || 'USD'] || '$';
+    const symbol = getCurrencySymbol(invoice.currency || 'USD');
     
     // Header
     doc.setFontSize(22);
@@ -376,7 +372,7 @@ const ClientInvoices = () => {
                         {formatDate(invoice.paidAt || invoice.date)}
                       </div>
                       <div className="table-cell amount">
-                        <strong>{formatCurrency(invoice.total)}</strong>
+                        <strong>{formatCurrencyAmount(invoice.total, invoice.currency)}</strong>
                       </div>
                       <div className="table-cell">
                         <span 
@@ -429,14 +425,14 @@ const ClientInvoices = () => {
             <ul style={{ paddingLeft: 0 }}>
               {selectedInvoice.lineItems && selectedInvoice.lineItems.map((item, idx) => (
                 <li key={idx} style={{ marginBottom: '8px', listStyle: 'none', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>
-                  <strong>{item.description}</strong> — {t('Qty')}: {item.quantity}, {t('Price')}: {formatCurrency(item.price)}, {t('Tax')}: {item.tax}%
+                  <strong>{item.description}</strong> — {t('Qty')}: {item.quantity}, {t('Price')}: {formatCurrencyAmount(item.price, selectedInvoice.currency)}, {t('Tax')}: {item.tax}%
                 </li>
               ))}
             </ul>
-            <p><strong>{t('Subtotal')}:</strong> {formatCurrency(selectedInvoice.subtotal)}</p>
-            <p><strong>{t('Tax')}:</strong> {formatCurrency(selectedInvoice.totalTax)}</p>
-            <p><strong>{t('Discount')}:</strong> {formatCurrency(selectedInvoice.discount)}</p>
-            <p><strong>{t('Total')}:</strong> <span style={{ fontWeight: 'bold', fontSize: '1.2em' }}>{formatCurrency(selectedInvoice.total)}</span></p>
+            <p><strong>{t('Subtotal')}:</strong> {formatCurrencyAmount(selectedInvoice.subtotal, selectedInvoice.currency)}</p>
+            <p><strong>{t('Tax')}:</strong> {formatCurrencyAmount(selectedInvoice.totalTax, selectedInvoice.currency)}</p>
+            <p><strong>{t('Discount')}:</strong> {formatCurrencyAmount(selectedInvoice.discount, selectedInvoice.currency)}</p>
+            <p><strong>{t('Total')}:</strong> <span style={{ fontWeight: 'bold', fontSize: '1.2em' }}>{formatCurrencyAmount(selectedInvoice.total, selectedInvoice.currency)}</span></p>
           </div>
         </div>
       )}

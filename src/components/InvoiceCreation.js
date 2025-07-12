@@ -3,11 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { db } from '../firebase';
-import { collection, addDoc, Timestamp, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
+import { formatCurrency, getCurrencyOptions } from '../utils/currency';
+import { useAuth } from '../context/AuthContext';
 import './Dashboard.css';
 
 const defaultLine = { description: '', quantity: 1, price: 0, tax: 0 };
-const currencySymbols = { USD: '$', EUR: '€', RON: 'lei', GBP: '£' };
 
 const recurringFrequencies = [
   { value: 'weekly', label: 'Weekly' },
@@ -18,6 +19,7 @@ const recurringFrequencies = [
 
 const InvoiceCreation = () => {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState('');
   const [lineItems, setLineItems] = useState([ { ...defaultLine } ]);
@@ -45,7 +47,30 @@ const InvoiceCreation = () => {
 
   useEffect(() => {
     fetchClients();
-  }, []);
+    loadUserSettings();
+  }, [currentUser]);
+
+  const loadUserSettings = async () => {
+    if (!currentUser) return;
+    
+    try {
+      const userDoc = doc(db, 'users', currentUser.uid);
+      const userSnap = await getDoc(userDoc);
+      
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        if (userData.settings?.defaultCurrency) {
+          setCurrency(userData.settings.defaultCurrency);
+        }
+        if (userData.settings?.taxRate !== undefined) {
+          // Update default line items with user's default tax rate
+          setLineItems([{ ...defaultLine, tax: userData.settings.taxRate }]);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user settings:', error);
+    }
+  };
 
   const fetchClients = async () => {
     try {
@@ -369,10 +394,11 @@ const InvoiceCreation = () => {
                   marginBottom: '10px',
                 }}
               >
-                <option value="USD">US Dollar ($)</option>
-                <option value="EUR">Euro (€)</option>
-                <option value="RON">Romanian Leu (lei)</option>
-                <option value="GBP">British Pound (£)</option>
+                {getCurrencyOptions().map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -442,11 +468,11 @@ const InvoiceCreation = () => {
             }}>
               <h4 style={{ marginBottom: '15px', color: '#333' }}>Invoice Summary</h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div>Subtotal: <span style={{ fontWeight: '600' }}>{currencySymbols[currency]}{subtotal.toFixed(2)}</span></div>
-                <div>Tax: <span style={{ fontWeight: '600' }}>{currencySymbols[currency]}{totalTax.toFixed(2)}</span></div>
-                <div>Discount: <span style={{ fontWeight: '600' }}>{currencySymbols[currency]}{Number(discount).toFixed(2)}</span></div>
+                <div>Subtotal: <span style={{ fontWeight: '600' }}>{formatCurrency(subtotal, currency)}</span></div>
+                <div>Tax: <span style={{ fontWeight: '600' }}>{formatCurrency(totalTax, currency)}</span></div>
+                <div>Discount: <span style={{ fontWeight: '600' }}>{formatCurrency(Number(discount), currency)}</span></div>
                 <div style={{ fontSize: '1.2em', fontWeight: '700', color: '#6a11cb' }}>
-                  Total: {currencySymbols[currency]}{total.toFixed(2)}
+                  Total: {formatCurrency(total, currency)}
                 </div>
               </div>
             </div>

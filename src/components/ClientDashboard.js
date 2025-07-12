@@ -8,6 +8,7 @@ import ThemeSwitcher from './ThemeSwitcher';
 import './ClientDashboard.css';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
+import { formatCurrency, getCurrencySymbol } from '../utils/currency';
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -55,7 +56,7 @@ const ClientDashboard = () => {
       const querySnapshot = await getDocs(q);
       
       const invoices = [];
-      let totalOutstanding = 0;
+      const outstandingByCurrency = {};
       let paidCount = 0;
       let overdueCount = 0;
 
@@ -65,11 +66,19 @@ const ClientDashboard = () => {
         
         if (invoice.status === 'paid') {
           paidCount++;
-        } else if (invoice.status === 'overdue') {
-          overdueCount++;
-          totalOutstanding += invoice.total || 0;
-        } else if (invoice.status === 'pending') {
-          totalOutstanding += invoice.total || 0;
+        } else if (invoice.status === 'overdue' || invoice.status === 'pending') {
+          if (invoice.status === 'overdue') {
+            overdueCount++;
+          }
+          
+          // Group outstanding amounts by currency
+          const currency = invoice.currency || 'USD';
+          const amount = invoice.total || 0;
+          
+          if (!outstandingByCurrency[currency]) {
+            outstandingByCurrency[currency] = 0;
+          }
+          outstandingByCurrency[currency] += amount;
         }
       });
 
@@ -85,7 +94,7 @@ const ClientDashboard = () => {
       setRecentInvoices(sortedInvoices);
       setSummary({
         totalInvoices: invoices.length,
-        outstandingBalance: totalOutstanding,
+        outstandingBalance: outstandingByCurrency,
         paidInvoices: paidCount,
         overdueInvoices: overdueCount
       });
@@ -115,11 +124,8 @@ const ClientDashboard = () => {
     }
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount || 0);
+  const formatCurrencyAmount = (amount, currencyCode = 'USD') => {
+    return formatCurrency(amount || 0, currencyCode);
   };
 
   const formatDate = (date) => {
@@ -214,7 +220,17 @@ const ClientDashboard = () => {
             </div>
             <div className="summary-card">
               <h3>{t('Outstanding Balance')}</h3>
-              <p className="summary-number outstanding">{formatCurrency(summary.outstandingBalance)}</p>
+              <div className="summary-number outstanding">
+                {typeof summary.outstandingBalance === 'object' ? (
+                  Object.entries(summary.outstandingBalance).map(([currency, amount]) => (
+                    <div key={currency} style={{ marginBottom: '4px' }}>
+                      {formatCurrencyAmount(amount, currency)}
+                    </div>
+                  ))
+                ) : (
+                  formatCurrencyAmount(summary.outstandingBalance)
+                )}
+              </div>
             </div>
             <div className="summary-card">
               <h3>{t('Paid Invoices')}</h3>
@@ -246,7 +262,7 @@ const ClientDashboard = () => {
                         <p className="invoice-date">
                           {formatDate(invoice.paidAt || invoice.date)}
                         </p>
-                        <p className="invoice-amount">{formatCurrency(invoice.total)}</p>
+                        <p className="invoice-amount">{formatCurrencyAmount(invoice.total, invoice.currency)}</p>
                       </div>
                       <div className="invoice-status">
                         <span 
@@ -309,14 +325,14 @@ const ClientDashboard = () => {
             <ul style={{ paddingLeft: 0 }}>
               {selectedInvoice.lineItems && selectedInvoice.lineItems.map((item, idx) => (
                 <li key={idx} style={{ marginBottom: '8px', listStyle: 'none', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>
-                  <strong>{item.description}</strong> — {t('Qty')}: {item.quantity}, {t('Price')}: {formatCurrency(item.price)}, {t('Tax')}: {item.tax}%
+                  <strong>{item.description}</strong> — {t('Qty')}: {item.quantity}, {t('Price')}: {formatCurrencyAmount(item.price, selectedInvoice.currency)}, {t('Tax')}: {item.tax}%
                 </li>
               ))}
             </ul>
-            <p><strong>{t('Subtotal')}:</strong> {formatCurrency(selectedInvoice.subtotal)}</p>
-            <p><strong>{t('Tax')}:</strong> {formatCurrency(selectedInvoice.totalTax)}</p>
-            <p><strong>{t('Discount')}:</strong> {formatCurrency(selectedInvoice.discount)}</p>
-            <p><strong>{t('Total')}:</strong> <span style={{ fontWeight: 'bold', fontSize: '1.2em' }}>{formatCurrency(selectedInvoice.total)}</span></p>
+                          <p><strong>{t('Subtotal')}:</strong> {formatCurrencyAmount(selectedInvoice.subtotal, selectedInvoice.currency)}</p>
+              <p><strong>{t('Tax')}:</strong> {formatCurrencyAmount(selectedInvoice.totalTax, selectedInvoice.currency)}</p>
+              <p><strong>{t('Discount')}:</strong> {formatCurrencyAmount(selectedInvoice.discount, selectedInvoice.currency)}</p>
+              <p><strong>{t('Total')}:</strong> <span style={{ fontWeight: 'bold', fontSize: '1.2em' }}>{formatCurrencyAmount(selectedInvoice.total, selectedInvoice.currency)}</span></p>
           </div>
         </div>
       )}
