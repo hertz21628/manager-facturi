@@ -347,6 +347,29 @@
   color: #ccc;
 }
 
+.dark-theme .client-user-info select {
+  background: #1a1a2e;
+  border-color: #444;
+  color: #fff;
+  backdrop-filter: blur(10px);
+}
+
+.dark-theme .client-user-info select:focus {
+  border-color: #6a11cb;
+  background: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.2);
+}
+
+.dark-theme .client-user-info select option {
+  background: #1a1a2e;
+  color: #fff;
+  border: none;
+}
+
+.dark-theme .client-user-info select option:hover {
+  background: #2a2a2a;
+}
+
 .dark-theme .client-nav {
   background: rgba(0, 0, 0, 0.8);
 }

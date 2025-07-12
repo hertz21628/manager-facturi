@@ -7,6 +7,7 @@ import ThemeSwitcher from './ThemeSwitcher';
 import './ClientInvoices.css';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { useTranslation } from 'react-i18next';
 
 const currencySymbols = { USD: '$', EUR: '€', RON: 'lei', GBP: '£' };
 
@@ -19,6 +20,7 @@ const ClientInvoices = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const { currentUser } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (currentUser) {
@@ -212,12 +214,12 @@ const ClientInvoices = () => {
     <div className="client-invoices">
       <header className="client-header">
         <div className="client-header-content">
-          <h1>My Invoices</h1>
+          <h1>{t('My Invoices')}</h1>
           <div className="header-actions">
             <ThemeSwitcher />
             <Link to="/client/dashboard" className="back-btn">
               <i className="fas fa-arrow-left"></i>
-              Back to Dashboard
+              {t('Back to Dashboard')}
             </Link>
           </div>
         </div>
@@ -227,27 +229,27 @@ const ClientInvoices = () => {
         <nav className="client-nav">
           <Link to="/client/dashboard" className="nav-item">
             <i className="fas fa-tachometer-alt"></i>
-            Dashboard
+            {t('Dashboard')}
           </Link>
           <Link to="/client/invoices" className="nav-item active">
             <i className="fas fa-file-invoice"></i>
-            My Invoices
+            {t('My Invoices')}
           </Link>
           <Link to="/client/payments" className="nav-item">
             <i className="fas fa-credit-card"></i>
-            Payments
+            {t('Payments')}
           </Link>
           <Link to="/client/profile" className="nav-item">
             <i className="fas fa-user"></i>
-            Profile
+            {t('Profile')}
           </Link>
         </nav>
 
         <main className="client-main">
           <div className="invoices-header">
             <div className="invoices-title">
-              <h2>Invoice History</h2>
-              <p>View and manage all your invoices</p>
+              <h2>{t('Invoice History')}</h2>
+              <p>{t('View and manage all your invoices')}</p>
             </div>
             
             <div className="invoices-filters">
@@ -255,7 +257,7 @@ const ClientInvoices = () => {
                 <i className="fas fa-search"></i>
                 <input
                   type="text"
-                  placeholder="Search invoices..."
+                  placeholder={t('Search invoices...')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -266,33 +268,33 @@ const ClientInvoices = () => {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="status-filter"
               >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="paid">Paid</option>
-                <option value="overdue">Overdue</option>
+                <option value="all">{t('All Status')}</option>
+                <option value="pending">{t('Pending')}</option>
+                <option value="paid">{t('Paid')}</option>
+                <option value="overdue">{t('Overdue')}</option>
               </select>
             </div>
           </div>
 
           <div className="invoices-summary">
             <div className="summary-item">
-              <span className="summary-label">Total Invoices:</span>
+              <span className="summary-label">{t('Total Invoices')}:</span>
               <span className="summary-value">{invoices.length}</span>
             </div>
             <div className="summary-item">
-              <span className="summary-label">Pending:</span>
+              <span className="summary-label">{t('Pending')}:</span>
               <span className="summary-value pending">
                 {invoices.filter(inv => inv.status === 'pending').length}
               </span>
             </div>
             <div className="summary-item">
-              <span className="summary-label">Paid:</span>
+              <span className="summary-label">{t('Paid')}:</span>
               <span className="summary-value paid">
                 {invoices.filter(inv => inv.status === 'paid').length}
               </span>
             </div>
             <div className="summary-item">
-              <span className="summary-label">Overdue:</span>
+              <span className="summary-label">{t('Overdue')}:</span>
               <span className="summary-value overdue">
                 {invoices.filter(inv => inv.status === 'overdue').length}
               </span>
@@ -303,23 +305,23 @@ const ClientInvoices = () => {
             {filteredInvoices.length === 0 ? (
               <div className="no-invoices">
                 <i className="fas fa-file-invoice"></i>
-                <h3>No invoices found</h3>
+                <h3>{t('No invoices found')}</h3>
                 <p>
                   {searchTerm || statusFilter !== 'all' 
-                    ? 'Try adjusting your search or filters'
-                    : 'You don\'t have any invoices yet'
+                    ? t('Try adjusting your search or filters')
+                    : t('You don\'t have any invoices yet')
                   }
                 </p>
               </div>
             ) : (
               <div className="invoices-table">
                 <div className="table-header">
-                  <div className="header-cell">Invoice #</div>
-                  <div className="header-cell">Date</div>
-                  <div className="header-cell">Amount</div>
-                  <div className="header-cell">Status</div>
-                  <div className="header-cell">Due Date</div>
-                  <div className="header-cell">Actions</div>
+                  <div className="header-cell">{t('Invoice #')}</div>
+                  <div className="header-cell">{t('Date')}</div>
+                  <div className="header-cell">{t('Amount')}</div>
+                  <div className="header-cell">{t('Status')}</div>
+                  <div className="header-cell">{t('Due Date')}</div>
+                  <div className="header-cell">{t('Actions')}</div>
                 </div>
                 
                 <div className="table-body">
@@ -339,7 +341,7 @@ const ClientInvoices = () => {
                           className="status-badge"
                           style={{ backgroundColor: getStatusColor(invoice.status) }}
                         >
-                          {invoice.status}
+                          {t(invoice.status)}
                         </span>
                       </div>
                       <div className="table-cell">
@@ -351,14 +353,14 @@ const ClientInvoices = () => {
                           onClick={() => openModal(invoice)}
                         >
                           <i className="fas fa-eye"></i>
-                          View
+                          {t('View')}
                         </button>
                         <button 
                           onClick={() => downloadInvoice(invoice)}
                           className="action-btn download"
                         >
                           <i className="fas fa-download"></i>
-                          Download
+                          {t('Download')}
                         </button>
                       </div>
                     </div>
@@ -375,24 +377,24 @@ const ClientInvoices = () => {
         <div className="invoice-modal-overlay" onClick={closeModal}>
           <div className="invoice-modal" onClick={e => e.stopPropagation()}>
             <button className="modal-close" onClick={closeModal}>&times;</button>
-            <h2>Invoice #{selectedInvoice.invoiceNumber}</h2>
-            <p><strong>Client:</strong> {selectedInvoice.clientName} ({selectedInvoice.clientEmail})</p>
-            <p><strong>Date:</strong> {formatDate(selectedInvoice.date)}</p>
-            <p><strong>Due Date:</strong> {formatDate(selectedInvoice.dueDate)}</p>
-            <p><strong>Status:</strong> <span style={{ backgroundColor: getStatusColor(selectedInvoice.status), color: '#fff', padding: '2px 8px', borderRadius: '4px' }}>{selectedInvoice.status}</span></p>
-            <p><strong>Currency:</strong> {selectedInvoice.currency}</p>
-            <h3>Line Items</h3>
+            <h2>{t('Invoice')} #{selectedInvoice.invoiceNumber}</h2>
+            <p><strong>{t('Client')}:</strong> {selectedInvoice.clientName} ({selectedInvoice.clientEmail})</p>
+            <p><strong>{t('Date')}:</strong> {formatDate(selectedInvoice.date)}</p>
+            <p><strong>{t('Due Date')}:</strong> {formatDate(selectedInvoice.dueDate)}</p>
+            <p><strong>{t('Status')}:</strong> <span style={{ backgroundColor: getStatusColor(selectedInvoice.status), color: '#fff', padding: '2px 8px', borderRadius: '4px' }}>{t(selectedInvoice.status)}</span></p>
+            <p><strong>{t('Currency')}:</strong> {selectedInvoice.currency}</p>
+            <h3>{t('Line Items')}</h3>
             <ul style={{ paddingLeft: 0 }}>
               {selectedInvoice.lineItems && selectedInvoice.lineItems.map((item, idx) => (
                 <li key={idx} style={{ marginBottom: '8px', listStyle: 'none', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>
-                  <strong>{item.description}</strong> — Qty: {item.quantity}, Price: {formatCurrency(item.price)}, Tax: {item.tax}%
+                  <strong>{item.description}</strong> — {t('Qty')}: {item.quantity}, {t('Price')}: {formatCurrency(item.price)}, {t('Tax')}: {item.tax}%
                 </li>
               ))}
             </ul>
-            <p><strong>Subtotal:</strong> {formatCurrency(selectedInvoice.subtotal)}</p>
-            <p><strong>Tax:</strong> {formatCurrency(selectedInvoice.totalTax)}</p>
-            <p><strong>Discount:</strong> {formatCurrency(selectedInvoice.discount)}</p>
-            <p><strong>Total:</strong> <span style={{ fontWeight: 'bold', fontSize: '1.2em' }}>{formatCurrency(selectedInvoice.total)}</span></p>
+            <p><strong>{t('Subtotal')}:</strong> {formatCurrency(selectedInvoice.subtotal)}</p>
+            <p><strong>{t('Tax')}:</strong> {formatCurrency(selectedInvoice.totalTax)}</p>
+            <p><strong>{t('Discount')}:</strong> {formatCurrency(selectedInvoice.discount)}</p>
+            <p><strong>{t('Total')}:</strong> <span style={{ fontWeight: 'bold', fontSize: '1.2em' }}>{formatCurrency(selectedInvoice.total)}</span></p>
           </div>
         </div>
       )}

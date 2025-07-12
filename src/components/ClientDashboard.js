@@ -6,6 +6,14 @@ import { auth, db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import ThemeSwitcher from './ThemeSwitcher';
 import './ClientDashboard.css';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
+
+const LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'ro', label: 'Romanian' },
+  { code: 'de', label: 'German' },
+];
 
 const ClientDashboard = () => {
   const [recentInvoices, setRecentInvoices] = useState([]);
@@ -18,7 +26,9 @@ const ClientDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
   const { currentUser } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,6 +36,11 @@ const ClientDashboard = () => {
       fetchClientData();
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    localStorage.setItem('language', language);
+    i18n.changeLanguage(language);
+  }, [language]);
 
   const fetchClientData = async () => {
     try {
@@ -133,11 +148,30 @@ const ClientDashboard = () => {
     <div className="client-dashboard">
       <header className="client-header">
         <div className="client-header-content">
-          <h1>Client Portal</h1>
+          <h1>{t('Client Portal')}</h1>
           <div className="client-user-info">
-            <span>Welcome, {currentUser?.email}</span>
+            <span>{t('Welcome')}, {currentUser?.email}</span>
             <ThemeSwitcher />
-            <button onClick={handleLogout} className="logout-btn">Logout</button>
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              style={{
+                padding: '0.5rem 0.75rem',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '0.9rem',
+                background: 'white',
+                cursor: 'pointer',
+                minWidth: '120px'
+              }}
+            >
+              {LANGUAGES.map(l => (
+                <option key={l.code} value={l.code}>
+                  {t(l.label)}
+                </option>
+              ))}
+            </select>
+            <button onClick={handleLogout} className="logout-btn">{t('Logout')}</button>
           </div>
         </div>
       </header>
@@ -146,38 +180,38 @@ const ClientDashboard = () => {
         <nav className="client-nav">
           <Link to="/client/dashboard" className="nav-item active">
             <i className="fas fa-tachometer-alt"></i>
-            Dashboard
+            {t('Dashboard')}
           </Link>
           <Link to="/client/invoices" className="nav-item">
             <i className="fas fa-file-invoice"></i>
-            My Invoices
+            {t('My Invoices')}
           </Link>
           <Link to="/client/payments" className="nav-item">
             <i className="fas fa-credit-card"></i>
-            Payments
+            {t('Payments')}
           </Link>
           <Link to="/client/profile" className="nav-item">
             <i className="fas fa-user"></i>
-            Profile
+            {t('Profile')}
           </Link>
         </nav>
 
         <main className="client-main">
           <div className="dashboard-summary">
             <div className="summary-card">
-              <h3>Total Invoices</h3>
+              <h3>{t('Total Invoices')}</h3>
               <p className="summary-number">{summary.totalInvoices}</p>
             </div>
             <div className="summary-card">
-              <h3>Outstanding Balance</h3>
+              <h3>{t('Outstanding Balance')}</h3>
               <p className="summary-number outstanding">{formatCurrency(summary.outstandingBalance)}</p>
             </div>
             <div className="summary-card">
-              <h3>Paid Invoices</h3>
+              <h3>{t('Paid Invoices')}</h3>
               <p className="summary-number paid">{summary.paidInvoices}</p>
             </div>
             <div className="summary-card">
-              <h3>Overdue Invoices</h3>
+              <h3>{t('Overdue Invoices')}</h3>
               <p className="summary-number overdue">{summary.overdueInvoices}</p>
             </div>
           </div>
@@ -185,20 +219,20 @@ const ClientDashboard = () => {
           <div className="dashboard-content">
             <div className="recent-invoices">
               <div className="section-header">
-                <h2>Recent Invoices</h2>
-                <Link to="/client/invoices" className="view-all">View All</Link>
+                <h2>{t('Recent Invoices')}</h2>
+                <Link to="/client/invoices" className="view-all">{t('View All')}</Link>
               </div>
               
               {recentInvoices.length === 0 ? (
                 <div className="no-invoices">
-                  <p>No invoices found.</p>
+                  <p>{t('No invoices found.')}</p>
                 </div>
               ) : (
                 <div className="invoice-list">
                   {recentInvoices.map((invoice, index) => (
                     <div key={invoice.id} className="invoice-item">
                       <div className="invoice-info">
-                        <h4>Invoice {index + 1}</h4>
+                        <h4>{t('Invoice')} {index + 1}</h4>
                         <p className="invoice-date">
                           {new Date(invoice.date?.toDate()).toLocaleDateString()}
                         </p>
@@ -216,7 +250,7 @@ const ClientDashboard = () => {
                           onClick={() => openModal(invoice)}
                         >
                           <i className="fas fa-eye"></i>
-                          View
+                          {t('View')}
                         </button>
                       </div>
                     </div>
@@ -226,23 +260,23 @@ const ClientDashboard = () => {
             </div>
 
             <div className="quick-actions">
-              <h2>Quick Actions</h2>
+              <h2>{t('Quick Actions')}</h2>
               <div className="action-buttons">
                 <Link to="/client/invoices" className="action-btn">
                   <i className="fas fa-file-invoice"></i>
-                  View All Invoices
+                  {t('View All Invoices')}
                 </Link>
                 <Link to="/client/payments" className="action-btn">
                   <i className="fas fa-credit-card"></i>
-                  Make Payment
+                  {t('Make Payment')}
                 </Link>
                 <Link to="/client/profile" className="action-btn">
                   <i className="fas fa-user-edit"></i>
-                  Update Profile
+                  {t('Update Profile')}
                 </Link>
                 <Link to="/client/support" className="action-btn">
                   <i className="fas fa-headset"></i>
-                  Contact Support
+                  {t('Contact Support')}
                 </Link>
               </div>
             </div>
@@ -255,24 +289,24 @@ const ClientDashboard = () => {
         <div className="invoice-modal-overlay" onClick={closeModal}>
           <div className="invoice-modal" onClick={e => e.stopPropagation()}>
             <button className="modal-close" onClick={closeModal}>&times;</button>
-            <h2>Invoice #{selectedInvoice.invoiceNumber}</h2>
-            <p><strong>Client:</strong> {selectedInvoice.clientName} ({selectedInvoice.clientEmail})</p>
-            <p><strong>Date:</strong> {formatDate(selectedInvoice.date)}</p>
-            <p><strong>Due Date:</strong> {formatDate(selectedInvoice.dueDate)}</p>
-            <p><strong>Status:</strong> <span style={{ backgroundColor: getStatusColor(selectedInvoice.status), color: '#fff', padding: '2px 8px', borderRadius: '4px' }}>{selectedInvoice.status}</span></p>
-            <p><strong>Currency:</strong> {selectedInvoice.currency}</p>
-            <h3>Line Items</h3>
+            <h2>{t('Invoice')} #{selectedInvoice.invoiceNumber}</h2>
+            <p><strong>{t('Client')}:</strong> {selectedInvoice.clientName} ({selectedInvoice.clientEmail})</p>
+            <p><strong>{t('Date')}:</strong> {formatDate(selectedInvoice.date)}</p>
+            <p><strong>{t('Due Date')}:</strong> {formatDate(selectedInvoice.dueDate)}</p>
+            <p><strong>{t('Status')}:</strong> <span style={{ backgroundColor: getStatusColor(selectedInvoice.status), color: '#fff', padding: '2px 8px', borderRadius: '4px' }}>{selectedInvoice.status}</span></p>
+            <p><strong>{t('Currency')}:</strong> {selectedInvoice.currency}</p>
+            <h3>{t('Line Items')}</h3>
             <ul style={{ paddingLeft: 0 }}>
               {selectedInvoice.lineItems && selectedInvoice.lineItems.map((item, idx) => (
                 <li key={idx} style={{ marginBottom: '8px', listStyle: 'none', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>
-                  <strong>{item.description}</strong> — Qty: {item.quantity}, Price: {formatCurrency(item.price)}, Tax: {item.tax}%
+                  <strong>{item.description}</strong> — {t('Qty')}: {item.quantity}, {t('Price')}: {formatCurrency(item.price)}, {t('Tax')}: {item.tax}%
                 </li>
               ))}
             </ul>
-            <p><strong>Subtotal:</strong> {formatCurrency(selectedInvoice.subtotal)}</p>
-            <p><strong>Tax:</strong> {formatCurrency(selectedInvoice.totalTax)}</p>
-            <p><strong>Discount:</strong> {formatCurrency(selectedInvoice.discount)}</p>
-            <p><strong>Total:</strong> <span style={{ fontWeight: 'bold', fontSize: '1.2em' }}>{formatCurrency(selectedInvoice.total)}</span></p>
+            <p><strong>{t('Subtotal')}:</strong> {formatCurrency(selectedInvoice.subtotal)}</p>
+            <p><strong>{t('Tax')}:</strong> {formatCurrency(selectedInvoice.totalTax)}</p>
+            <p><strong>{t('Discount')}:</strong> {formatCurrency(selectedInvoice.discount)}</p>
+            <p><strong>{t('Total')}:</strong> <span style={{ fontWeight: 'bold', fontSize: '1.2em' }}>{formatCurrency(selectedInvoice.total)}</span></p>
           </div>
         </div>
       )}

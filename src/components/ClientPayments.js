@@ -5,6 +5,7 @@ import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import ThemeSwitcher from './ThemeSwitcher';
 import './ClientPayments.css';
+import { useTranslation } from 'react-i18next';
 
 const ClientPayments = () => {
   const [invoices, setInvoices] = useState([]);
@@ -22,6 +23,7 @@ const ClientPayments = () => {
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
   const { currentUser } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (currentUser) {
@@ -208,12 +210,12 @@ const ClientPayments = () => {
     <div className="client-payments">
       <header className="client-header">
         <div className="client-header-content">
-          <h1>Payments</h1>
+          <h1>{t('Payments')}</h1>
           <div className="header-actions">
             <ThemeSwitcher />
             <Link to="/client/dashboard" className="back-btn">
               <i className="fas fa-arrow-left"></i>
-              Back to Dashboard
+              {t('Back to Dashboard')}
             </Link>
           </div>
         </div>
@@ -223,19 +225,19 @@ const ClientPayments = () => {
         <nav className="client-nav">
           <Link to="/client/dashboard" className="nav-item">
             <i className="fas fa-tachometer-alt"></i>
-            Dashboard
+            {t('Dashboard')}
           </Link>
           <Link to="/client/invoices" className="nav-item">
             <i className="fas fa-file-invoice"></i>
-            My Invoices
+            {t('My Invoices')}
           </Link>
           <Link to="/client/payments" className="nav-item active">
             <i className="fas fa-credit-card"></i>
-            Payments
+            {t('Payments')}
           </Link>
           <Link to="/client/profile" className="nav-item">
             <i className="fas fa-user"></i>
-            Profile
+            {t('Profile')}
           </Link>
         </nav>
 
@@ -243,22 +245,22 @@ const ClientPayments = () => {
           {/* Payment Summary */}
           <div className="payment-summary">
             <div className="summary-card">
-              <h3>Outstanding Balance</h3>
+              <h3>{t('Outstanding Balance')}</h3>
               <p className="summary-amount outstanding">{formatCurrency(totalOutstanding)}</p>
-              <span className="summary-label">{outstandingInvoices.length} invoices pending</span>
+              <span className="summary-label">{outstandingInvoices.length} {t('invoices pending')}</span>
             </div>
             <div className="summary-card">
-              <h3>Total Paid</h3>
+              <h3>{t('Total Paid')}</h3>
               <p className="summary-amount paid">{formatCurrency(payments.reduce((sum, p) => sum + (p.total || 0), 0))}</p>
-              <span className="summary-label">{payments.length} payments made</span>
+              <span className="summary-label">{payments.length} {t('payments made')}</span>
             </div>
             <div className="summary-card">
-              <h3>Last Payment</h3>
+              <h3>{t('Last Payment')}</h3>
               <p className="summary-amount">
                 {payments.length > 0 ? formatCurrency(payments[0].total || 0) : '$0.00'}
               </p>
               <span className="summary-label">
-                {payments.length > 0 ? formatDate(payments[0].paidAt || payments[0].date) : 'No payments yet'}
+                {payments.length > 0 ? formatDate(payments[0].paidAt || payments[0].date) : t('No payments yet')}
               </span>
             </div>
           </div>
@@ -266,31 +268,31 @@ const ClientPayments = () => {
           {/* Outstanding Invoices */}
           <div className="outstanding-invoices">
             <div className="section-header">
-              <h2>Outstanding Invoices</h2>
-              <p>Make payments on your pending invoices</p>
+              <h2>{t('Outstanding Invoices')}</h2>
+              <p>{t('Make payments on your pending invoices')}</p>
             </div>
 
             {outstandingInvoices.length === 0 ? (
               <div className="no-outstanding">
                 <i className="fas fa-check-circle"></i>
-                <h3>All caught up!</h3>
-                <p>You have no outstanding invoices.</p>
+                <h3>{t('All caught up!')}</h3>
+                <p>{t('You have no outstanding invoices.')}</p>
               </div>
             ) : (
               <div className="invoice-grid">
                 {outstandingInvoices.map((invoice, index) => (
                   <div key={invoice.id} className="invoice-card">
                     <div className="invoice-header">
-                      <h4>Invoice #{invoice.invoiceNumber || (index + 1)}</h4>
+                      <h4>{t('Invoice')} #{invoice.invoiceNumber || (index + 1)}</h4>
                       <span 
                         className="status-badge"
                         style={{ backgroundColor: getStatusColor(invoice.status) }}
                       >
-                        {invoice.status}
+                        {t(invoice.status)}
                       </span>
                     </div>
                     <div className="invoice-details">
-                      <p className="invoice-date">Due: {formatDate(invoice.dueDate)}</p>
+                      <p className="invoice-date">{t('Due')}: {formatDate(invoice.dueDate)}</p>
                       <p className="invoice-amount">{formatCurrency(invoice.total)}</p>
                     </div>
                     <button 
@@ -298,7 +300,7 @@ const ClientPayments = () => {
                       className="pay-btn"
                     >
                       <i className="fas fa-credit-card"></i>
-                      Pay Now
+                      {t('Pay Now')}
                     </button>
                   </div>
                 ))}
@@ -309,25 +311,25 @@ const ClientPayments = () => {
           {/* Payment History */}
           <div className="payment-history">
             <div className="section-header">
-              <h2>Payment History</h2>
-              <p>View your past payment transactions</p>
+              <h2>{t('Payment History')}</h2>
+              <p>{t('View your past payment transactions')}</p>
             </div>
 
             {completedInvoices.length === 0 ? (
               <div className="no-payments">
                 <i className="fas fa-history"></i>
-                <h3>No payment history</h3>
-                <p>Your payment history will appear here.</p>
+                <h3>{t('No payment history')}</h3>
+                <p>{t('Your payment history will appear here.')}</p>
               </div>
             ) : (
               <div className="payments-table">
                 <div className="table-header">
-                  <div className="header-cell">Payment Date</div>
-                  <div className="header-cell">Invoice #</div>
-                  <div className="header-cell">Client</div>
-                  <div className="header-cell">Total Amount</div>
-                  <div className="header-cell">Payment Method</div>
-                  <div className="header-cell">Status</div>
+                  <div className="header-cell">{t('Payment Date')}</div>
+                  <div className="header-cell">{t('Invoice #')}</div>
+                  <div className="header-cell">{t('Client')}</div>
+                  <div className="header-cell">{t('Total Amount')}</div>
+                  <div className="header-cell">{t('Payment Method')}</div>
+                  <div className="header-cell">{t('Status')}</div>
                 </div>
                 <div className="table-body">
                   {completedInvoices.sort((a, b) => {
@@ -336,17 +338,17 @@ const ClientPayments = () => {
                     return dateB - dateA;
                   }).map((inv, index) => (
                     <div key={inv.id} className="table-row">
-                      <div className="table-cell" data-label="Payment Date">{formatDate(inv.paidAt || inv.date)}</div>
-                      <div className="table-cell" data-label="Invoice #">{inv.invoiceNumber || (index + 1)}</div>
-                      <div className="table-cell" data-label="Client">
+                      <div className="table-cell" data-label={t('Payment Date')}>{formatDate(inv.paidAt || inv.date)}</div>
+                      <div className="table-cell" data-label={t('Invoice #')}>{inv.invoiceNumber || (index + 1)}</div>
+                      <div className="table-cell" data-label={t('Client')}>
                         <strong>{inv.clientName}</strong>
                       </div>
-                      <div className="table-cell amount" data-label="Total Amount">
+                      <div className="table-cell amount" data-label={t('Total Amount')}>
                         <strong>{formatCurrency(inv.total)}</strong>
                       </div>
-                      <div className="table-cell" data-label="Payment Method">{inv.paymentMethod || 'Credit Card'}</div>
-                      <div className="table-cell" data-label="Status">
-                        <span className="status-badge" style={{ backgroundColor: getStatusColor(inv.status) }}>{inv.status}</span>
+                      <div className="table-cell" data-label={t('Payment Method')}>{inv.paymentMethod || t('Credit Card')}</div>
+                      <div className="table-cell" data-label={t('Status')}>
+                        <span className="status-badge" style={{ backgroundColor: getStatusColor(inv.status) }}>{t(inv.status)}</span>
                       </div>
                     </div>
                   ))}
@@ -362,7 +364,7 @@ const ClientPayments = () => {
         <div className="payment-modal-overlay">
           <div className="payment-modal">
             <div className="modal-header">
-              <h3>Make Payment</h3>
+              <h3>{t('Make Payment')}</h3>
               <button 
                 onClick={() => setShowPaymentModal(false)}
                 className="close-btn"
@@ -373,26 +375,26 @@ const ClientPayments = () => {
             
             <div className="modal-content">
               <div className="invoice-summary">
-                <h4>Invoice #{selectedInvoice.invoiceNumber}</h4>
+                <h4>{t('Invoice')} #{selectedInvoice.invoiceNumber}</h4>
                 <p className="amount">{formatCurrency(selectedInvoice.total)}</p>
-                <p className="due-date">Due: {formatDate(selectedInvoice.dueDate)}</p>
+                <p className="due-date">{t('Due')}: {formatDate(selectedInvoice.dueDate)}</p>
               </div>
 
               <div className="payment-form">
                 <div className="form-group">
-                  <label>Payment Method</label>
+                  <label>{t('Payment Method')}</label>
                   <select 
                     value={paymentForm.paymentMethod}
                     onChange={(e) => setPaymentForm({...paymentForm, paymentMethod: e.target.value})}
                   >
-                    <option value="credit-card">Credit Card</option>
-                    <option value="debit-card">Debit Card</option>
-                    <option value="bank-transfer">Bank Transfer</option>
+                    <option value="credit-card">{t('Credit Card')}</option>
+                    <option value="debit-card">{t('Debit Card')}</option>
+                    <option value="bank-transfer">{t('Bank Transfer')}</option>
                   </select>
                 </div>
 
                 <div className="form-group">
-                  <label>Card Number</label>
+                  <label>{t('Card Number')}</label>
                   <input 
                     type="text" 
                     placeholder="1234 5678 9012 3456" 
@@ -405,7 +407,7 @@ const ClientPayments = () => {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Expiry Date</label>
+                    <label>{t('Expiry Date')}</label>
                     <input 
                       type="text" 
                       placeholder="MM/YY" 
@@ -416,7 +418,7 @@ const ClientPayments = () => {
                     {formErrors.expiryDate && <span className="error-message">{formErrors.expiryDate}</span>}
                   </div>
                   <div className="form-group">
-                    <label>CVV</label>
+                    <label>{t('CVV')}</label>
                     <input 
                       type="text" 
                       placeholder="123" 
@@ -429,10 +431,10 @@ const ClientPayments = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Name on Card</label>
+                  <label>{t('Cardholder Name')}</label>
                   <input 
                     type="text" 
-                    placeholder="John Doe" 
+                    placeholder={t('Enter cardholder name')}
                     value={paymentForm.cardholderName}
                     onChange={(e) => setPaymentForm({...paymentForm, cardholderName: e.target.value})}
                     className={formErrors.cardholderName ? 'error' : ''}
@@ -442,11 +444,10 @@ const ClientPayments = () => {
 
                 <button 
                   onClick={handlePaymentSubmit}
-                  className="process-payment-btn"
                   disabled={isProcessing}
+                  className="process-payment-btn"
                 >
-                  <i className="fas fa-lock"></i>
-                  {isProcessing ? 'Processing...' : 'Process Payment'}
+                  {isProcessing ? t('Processing...') : t('Process Payment')}
                 </button>
               </div>
             </div>

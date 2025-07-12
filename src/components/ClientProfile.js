@@ -6,6 +6,7 @@ import { auth, db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import ThemeSwitcher from './ThemeSwitcher';
 import './ClientProfile.css';
+import { useTranslation } from 'react-i18next';
 
 const ClientProfile = () => {
   const { currentUser } = useAuth();
@@ -13,6 +14,7 @@ const ClientProfile = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const { t } = useTranslation();
   
   const [profile, setProfile] = useState({
     firstName: '',
@@ -150,7 +152,7 @@ const ClientProfile = () => {
   if (loading) {
     return (
       <div className="client-profile">
-        <div className="loading">Loading profile...</div>
+        <div className="loading">{t('Loading profile...')}</div>
       </div>
     );
   }
@@ -159,12 +161,12 @@ const ClientProfile = () => {
     <div className="client-profile">
       <header className="client-header">
         <div className="client-header-content">
-          <h1>My Profile</h1>
+          <h1>{t('My Profile')}</h1>
           <div className="header-actions">
             <ThemeSwitcher />
             <Link to="/client/dashboard" className="back-btn">
               <i className="fas fa-arrow-left"></i>
-              Back to Dashboard
+              {t('Back to Dashboard')}
             </Link>
           </div>
         </div>
@@ -174,26 +176,26 @@ const ClientProfile = () => {
         <nav className="client-nav">
           <Link to="/client/dashboard" className="nav-item">
             <i className="fas fa-tachometer-alt"></i>
-            Dashboard
+            {t('Dashboard')}
           </Link>
           <Link to="/client/invoices" className="nav-item">
             <i className="fas fa-file-invoice"></i>
-            My Invoices
+            {t('My Invoices')}
           </Link>
           <Link to="/client/payments" className="nav-item">
             <i className="fas fa-credit-card"></i>
-            Payments
+            {t('Payments')}
           </Link>
           <Link to="/client/profile" className="nav-item active">
             <i className="fas fa-user"></i>
-            Profile
+            {t('Profile')}
           </Link>
         </nav>
 
         <main className="client-main">
           <div className="profile-header">
-            <h2>Profile Settings</h2>
-            <p>Update your personal information and preferences</p>
+            <h2>{t('Profile Settings')}</h2>
+            <p>{t('Update your personal information and preferences')}</p>
           </div>
 
           {message && (
@@ -213,10 +215,10 @@ const ClientProfile = () => {
           <div className="profile-sections">
             {/* Personal Information */}
             <div className="profile-section">
-              <h3>Personal Information</h3>
+              <h3>{t('Personal Information')}</h3>
               <div className="form-grid">
                 <div className="form-group">
-                  <label htmlFor="firstName">First Name</label>
+                  <label htmlFor="firstName">{t('First Name')}</label>
                   <input
                     type="text"
                     id="firstName"
@@ -225,7 +227,7 @@ const ClientProfile = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="lastName">Last Name</label>
+                  <label htmlFor="lastName">{t('Last Name')}</label>
                   <input
                     type="text"
                     id="lastName"
@@ -234,7 +236,7 @@ const ClientProfile = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="email">Email Address</label>
+                  <label htmlFor="email">{t('Email Address')}</label>
                   <input
                     type="email"
                     id="email"
@@ -242,10 +244,10 @@ const ClientProfile = () => {
                     disabled
                     className="disabled"
                   />
-                  <small>Email cannot be changed</small>
+                  <small>{t('Email cannot be changed')}</small>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="phone">Phone Number</label>
+                  <label htmlFor="phone">{t('Phone Number')}</label>
                   <input
                     type="tel"
                     id="phone"
@@ -253,29 +255,24 @@ const ClientProfile = () => {
                     onChange={(e) => handleInputChange('phone', e.target.value)}
                   />
                 </div>
+                <div className="form-group">
+                  <label htmlFor="company">{t('Company')}</label>
+                  <input
+                    type="text"
+                    id="company"
+                    value={profile.company}
+                    onChange={(e) => handleInputChange('company', e.target.value)}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Company Information */}
+            {/* Address Information */}
             <div className="profile-section">
-              <h3>Company Information</h3>
-              <div className="form-group">
-                <label htmlFor="company">Company Name</label>
-                <input
-                  type="text"
-                  id="company"
-                  value={profile.company}
-                  onChange={(e) => handleInputChange('company', e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Address */}
-            <div className="profile-section">
-              <h3>Address</h3>
-              <div className="form-grid address-grid">
-                <div className="form-group full-width">
-                  <label htmlFor="street">Street Address</label>
+              <h3>{t('Address Information')}</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="street">{t('Street Address')}</label>
                   <input
                     type="text"
                     id="street"
@@ -284,7 +281,7 @@ const ClientProfile = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="city">City</label>
+                  <label htmlFor="city">{t('City')}</label>
                   <input
                     type="text"
                     id="city"
@@ -293,7 +290,7 @@ const ClientProfile = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="state">State/Province</label>
+                  <label htmlFor="state">{t('State/Province')}</label>
                   <input
                     type="text"
                     id="state"
@@ -302,7 +299,7 @@ const ClientProfile = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="zipCode">ZIP/Postal Code</label>
+                  <label htmlFor="zipCode">{t('ZIP/Postal Code')}</label>
                   <input
                     type="text"
                     id="zipCode"
@@ -311,7 +308,7 @@ const ClientProfile = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="country">Country</label>
+                  <label htmlFor="country">{t('Country')}</label>
                   <input
                     type="text"
                     id="country"
@@ -324,37 +321,34 @@ const ClientProfile = () => {
 
             {/* Preferences */}
             <div className="profile-section">
-              <h3>Preferences</h3>
+              <h3>{t('Preferences')}</h3>
               <div className="form-grid">
                 <div className="form-group">
-                  <label htmlFor="language">Language</label>
+                  <label htmlFor="language">{t('Language')}</label>
                   <select
                     id="language"
                     value={profile.preferences.language}
                     onChange={(e) => handlePreferenceChange('language', 'language', e.target.value)}
                   >
-                    <option value="en">English</option>
-                    <option value="es">Spanish</option>
-                    <option value="fr">French</option>
-                    <option value="de">German</option>
+                    <option value="en">{t('English')}</option>
+                    <option value="ro">{t('Romanian')}</option>
+                    <option value="de">{t('German')}</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="timezone">Timezone</label>
+                  <label htmlFor="timezone">{t('Timezone')}</label>
                   <select
                     id="timezone"
                     value={profile.preferences.timezone}
                     onChange={(e) => handlePreferenceChange('timezone', 'timezone', e.target.value)}
                   >
                     <option value="UTC">UTC</option>
-                    <option value="EST">Eastern Time</option>
-                    <option value="CST">Central Time</option>
-                    <option value="MST">Mountain Time</option>
-                    <option value="PST">Pacific Time</option>
+                    <option value="Europe/Bucharest">Europe/Bucharest</option>
+                    <option value="Europe/Berlin">Europe/Berlin</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="currency">Currency</label>
+                  <label htmlFor="currency">{t('Currency')}</label>
                   <select
                     id="currency"
                     value={profile.preferences.currency}
@@ -362,14 +356,13 @@ const ClientProfile = () => {
                   >
                     <option value="USD">USD ($)</option>
                     <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
-                    <option value="CAD">CAD (C$)</option>
+                    <option value="RON">RON (lei)</option>
                   </select>
                 </div>
               </div>
 
-              <div className="notification-preferences">
-                <h4>Notification Preferences</h4>
+              <div className="notifications-section">
+                <h4>{t('Notification Preferences')}</h4>
                 <div className="checkbox-group">
                   <label className="checkbox-label">
                     <input
@@ -377,7 +370,7 @@ const ClientProfile = () => {
                       checked={profile.preferences.notifications.email}
                       onChange={(e) => handlePreferenceChange('notifications', 'email', e.target.checked)}
                     />
-                    <span>Email Notifications</span>
+                    <span>{t('Email notifications')}</span>
                   </label>
                   <label className="checkbox-label">
                     <input
@@ -385,7 +378,7 @@ const ClientProfile = () => {
                       checked={profile.preferences.notifications.sms}
                       onChange={(e) => handlePreferenceChange('notifications', 'sms', e.target.checked)}
                     />
-                    <span>SMS Notifications</span>
+                    <span>{t('SMS notifications')}</span>
                   </label>
                 </div>
               </div>
@@ -393,22 +386,12 @@ const ClientProfile = () => {
 
             {/* Save Button */}
             <div className="profile-actions">
-              <button 
-                onClick={handleSave} 
+              <button
+                onClick={handleSave}
                 disabled={saving}
                 className="save-btn"
               >
-                {saving ? (
-                  <>
-                    <i className="fas fa-spinner fa-spin"></i>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-save"></i>
-                    Save Changes
-                  </>
-                )}
+                {saving ? t('Saving...') : t('Save Changes')}
               </button>
             </div>
           </div>
