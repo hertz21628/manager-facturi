@@ -1,0 +1,124 @@
+.settings-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.settings-section {
+  margin-bottom: 20px;
+}
+
+.settings-section h3 {
+  margin-bottom: 20px;
+  color: #6a11cb;
+}
+
+.settings-field {
+  margin-bottom: 15px;
+}
+
+.settings-field label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.settings-input,
+.settings-select,
+.settings-textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  background: #fff;
+  color: #333;
+}
+
+.settings-input.short,
+.settings-select.short {
+  width: 200px;
+  box-sizing: border-box;
+}
+
+.settings-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.settings-help-text {
+  color: #666;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.settings-checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.settings-checkbox {
+  margin-right: 8px;
+}
+
+.settings-save-button {
+  padding: 12px 30px;
+  font-size: 16px;
+  background: #6a11cb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.3s;
+}
+
+.settings-save-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.settings-message {
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  border: 1px solid;
+}
+
+.settings-message.success {
+  background: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
+}
+
+.settings-message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+
+/* Dark theme overrides */
+body.dark-theme .settings-input,
+body.dark-theme .settings-select,
+body.dark-theme .settings-textarea {
+  background: #232526;
+  color: #f8f8f8;
+  border: 1px solid #444;
+}
+
+body.dark-theme .settings-help-text {
+  color: #ccc;
+}
+
+body.dark-theme .settings-message.success {
+  background: #1e4a2e;
+  color: #d4edda;
+  border-color: #2d5a3d;
+}
+
+body.dark-theme .settings-message.error {
+  background: #4a1e1e;
+  color: #f8d7da;
+  border-color: #5a2d2d;
+} 

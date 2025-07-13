@@ -65,7 +65,8 @@ body.dark-theme .feature-card {
   box-shadow: 0 2px 8px #0006;
 }
 body.dark-theme input,
-body.dark-theme select {
+body.dark-theme select,
+body.dark-theme textarea {
   background: #232526;
   color: #f8f8f8;
   border: 1px solid #444;
@@ -103,7 +104,8 @@ body.dark-theme .feature-card .sidebar-header h2 {
 }
 body.dark-theme .feature-card p,
 body.dark-theme .feature-card div,
-body.dark-theme .feature-card label {
+body.dark-theme .feature-card label,
+body.dark-theme .feature-card small {
   color: #fff !important;
 }
 body.dark-theme td, body.dark-theme th {

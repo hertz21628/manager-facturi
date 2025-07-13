@@ -1,0 +1,157 @@
+.client-form {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.client-input {
+  flex: 2;
+  min-width: 120px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #fff;
+  color: #333;
+  font-size: 14px;
+}
+
+.client-search {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  min-width: 200px;
+  background: #fff;
+  color: #333;
+}
+
+.client-button {
+  padding: 10px 24px;
+  background: #6a11cb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.client-button:hover {
+  background: #2575fc;
+}
+
+.client-button.cancel {
+  background: #aaa;
+}
+
+.client-button.cancel:hover {
+  background: #999;
+}
+
+.client-edit-button {
+  padding: 7px 14px;
+  background: #6a11cb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 13px;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.client-edit-button:hover {
+  background: #2575fc;
+}
+
+.client-delete-button {
+  padding: 7px 14px;
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.client-delete-button:hover {
+  background: #d90429;
+}
+
+.client-delete-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.client-search-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.client-total {
+  font-weight: 600;
+  color: #6a11cb;
+}
+
+.client-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.client-table thead tr {
+  border-bottom: 2px solid #e9ecef;
+}
+
+.client-table tbody tr {
+  border-bottom: 1px solid #e9ecef;
+  background: #fff;
+}
+
+.client-table td {
+  padding: 15px;
+}
+
+.client-loading {
+  text-align: center;
+  padding: 30px;
+}
+
+.client-empty {
+  text-align: center;
+  padding: 30px;
+}
+
+/* Dark theme overrides */
+body.dark-theme .client-input,
+body.dark-theme .client-search {
+  background: #232526;
+  color: #f8f8f8;
+  border: 1px solid #444;
+}
+
+body.dark-theme .client-input::placeholder,
+body.dark-theme .client-search::placeholder {
+  color: #aaa;
+}
+
+body.dark-theme .client-table tbody tr {
+  background: #232526;
+  color: #f8f8f8;
+}
+
+body.dark-theme .client-table tbody tr:hover {
+  background: #2a2d2e;
+}
+
+body.dark-theme .client-total {
+  color: #fff;
+} 

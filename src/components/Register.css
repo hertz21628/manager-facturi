@@ -63,6 +63,14 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1rem;
+    background-color: #ffffff;
+    color: #333;
+  }
+  
+  .form-group input:focus {
+    outline: none;
+    border-color: #6a11cb;
+    box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.1);
   }
   
   .register-button {
@@ -96,4 +104,40 @@
   
   .login-link a:hover {
     text-decoration: underline;
+  }
+
+  /* Dark Theme Styles */
+  body.dark-theme .register-container {
+    background-color: #232526;
+  }
+  
+  body.dark-theme .register-form-container {
+    background-color: #232526;
+  }
+  
+  body.dark-theme .register-form-container h2 {
+    color: #f8f8f8;
+  }
+  
+  body.dark-theme .form-group label {
+    color: #f8f8f8;
+  }
+  
+  body.dark-theme .form-group input {
+    background-color: #333;
+    color: #f8f8f8;
+    border: 1px solid #555;
+  }
+  
+  body.dark-theme .form-group input:focus {
+    border-color: #6a11cb;
+    box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.3);
+  }
+  
+  body.dark-theme .login-link {
+    color: #ccc;
+  }
+  
+  body.dark-theme .login-link a {
+    color: #6a11cb;
   }

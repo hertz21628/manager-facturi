@@ -6,6 +6,7 @@ import { db } from '../firebase';
 import { collection, addDoc, Timestamp, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
 import { formatCurrency, getCurrencyOptions } from '../utils/currency';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import './Dashboard.css';
 
 const defaultLine = { description: '', quantity: 1, price: 0, tax: 0 };
@@ -20,6 +21,7 @@ const recurringFrequencies = [
 const InvoiceCreation = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const { isDarkMode } = useTheme();
   const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState('');
   const [lineItems, setLineItems] = useState([ { ...defaultLine } ]);
@@ -415,44 +417,77 @@ const InvoiceCreation = () => {
               {isRecurring && (
                 <div style={{ marginTop: 10, paddingLeft: 8 }}>
                   <div style={{ marginBottom: 10 }}>
-                    <label style={{ fontWeight: 500, marginRight: 8 }}>Frequency:</label>
+                    <label style={{ fontWeight: 500, marginRight: 8, color: isDarkMode ? '#fff' : '#333' }}>Frequency:</label>
                     <select
                       value={recurringFrequency}
                       onChange={e => setRecurringFrequency(e.target.value)}
-                      style={{ padding: '8px', borderRadius: 5, border: '1px solid #ddd', fontSize: 14 }}
+                      style={{ 
+                        padding: '8px', 
+                        borderRadius: 5, 
+                        border: '1px solid #ddd', 
+                        fontSize: 14,
+                        background: isDarkMode ? '#232526' : '#fff',
+                        color: isDarkMode ? '#f8f8f8' : '#333',
+                        borderColor: isDarkMode ? '#444' : '#ddd'
+                      }}
                     >
                       {recurringFrequencies.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
                     </select>
                   </div>
                   <div style={{ marginBottom: 10 }}>
-                    <label style={{ fontWeight: 500, marginRight: 8 }}>Start Date:</label>
+                    <label style={{ fontWeight: 500, marginRight: 8, color: isDarkMode ? '#fff' : '#333' }}>Start Date:</label>
                     <input
                       type="date"
                       value={recurringStart}
                       onChange={e => setRecurringStart(e.target.value)}
-                      style={{ padding: '8px', borderRadius: 5, border: '1px solid #ddd', fontSize: 14 }}
+                      style={{ 
+                        padding: '8px', 
+                        borderRadius: 5, 
+                        border: '1px solid #ddd', 
+                        fontSize: 14,
+                        background: isDarkMode ? '#232526' : '#fff',
+                        color: isDarkMode ? '#f8f8f8' : '#333',
+                        borderColor: isDarkMode ? '#444' : '#ddd'
+                      }}
                     />
                   </div>
                   <div style={{ marginBottom: 10 }}>
-                    <label style={{ fontWeight: 500, marginRight: 8 }}>End Date (optional):</label>
+                    <label style={{ fontWeight: 500, marginRight: 8, color: isDarkMode ? '#fff' : '#333' }}>End Date (optional):</label>
                     <input
                       type="date"
                       value={recurringEnd}
                       onChange={e => setRecurringEnd(e.target.value)}
-                      style={{ padding: '8px', borderRadius: 5, border: '1px solid #ddd', fontSize: 14 }}
+                      style={{ 
+                        padding: '8px', 
+                        borderRadius: 5, 
+                        border: '1px solid #ddd', 
+                        fontSize: 14,
+                        background: isDarkMode ? '#232526' : '#fff',
+                        color: isDarkMode ? '#f8f8f8' : '#333',
+                        borderColor: isDarkMode ? '#444' : '#ddd'
+                      }}
                     />
                   </div>
                   <div style={{ marginBottom: 10 }}>
-                    <label style={{ fontWeight: 500, marginRight: 8 }}>Occurrences (optional):</label>
+                    <label style={{ fontWeight: 500, marginRight: 8, color: isDarkMode ? '#fff' : '#333' }}>Occurrences (optional):</label>
                     <input
                       type="number"
                       min="1"
                       value={recurringOccurrences}
                       onChange={e => setRecurringOccurrences(e.target.value)}
-                      style={{ padding: '8px', borderRadius: 5, border: '1px solid #ddd', fontSize: 14, width: 100 }}
+                      style={{ 
+                        padding: '8px', 
+                        borderRadius: 5, 
+                        border: '1px solid #ddd', 
+                        fontSize: 14, 
+                        width: 100,
+                        background: isDarkMode ? '#232526' : '#fff',
+                        color: isDarkMode ? '#f8f8f8' : '#333',
+                        borderColor: isDarkMode ? '#444' : '#ddd'
+                      }}
                     />
                   </div>
-                  <div style={{ color: '#888', fontSize: 13 }}>
+                  <div style={{ color: isDarkMode ? '#ccc' : '#888', fontSize: 13 }}>
                     <p>Recurring invoices will be automatically generated based on the selected frequency, starting from the start date. You can set either an end date or a number of occurrences (or both).</p>
                   </div>
                 </div>
@@ -460,18 +495,18 @@ const InvoiceCreation = () => {
             </div>
 
             <div style={{ 
-              background: '#f8f9fa', 
+              background: isDarkMode ? '#232526' : '#f8f9fa', 
               padding: '20px', 
               borderRadius: '8px', 
               marginBottom: '30px',
-              border: '1px solid #e9ecef'
+              border: isDarkMode ? '1px solid #444' : '1px solid #e9ecef'
             }}>
-              <h4 style={{ marginBottom: '15px', color: '#333' }}>Invoice Summary</h4>
+              <h4 style={{ marginBottom: '15px', color: isDarkMode ? '#fff' : '#333' }}>Invoice Summary</h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div>Subtotal: <span style={{ fontWeight: '600' }}>{formatCurrency(subtotal, currency)}</span></div>
-                <div>Tax: <span style={{ fontWeight: '600' }}>{formatCurrency(totalTax, currency)}</span></div>
-                <div>Discount: <span style={{ fontWeight: '600' }}>{formatCurrency(Number(discount), currency)}</span></div>
-                <div style={{ fontSize: '1.2em', fontWeight: '700', color: '#6a11cb' }}>
+                <div style={{ color: isDarkMode ? '#fff' : '#333' }}>Subtotal: <span style={{ fontWeight: '600', color: isDarkMode ? '#fff' : '#333' }}>{formatCurrency(subtotal, currency)}</span></div>
+                <div style={{ color: isDarkMode ? '#fff' : '#333' }}>Tax: <span style={{ fontWeight: '600', color: isDarkMode ? '#fff' : '#333' }}>{formatCurrency(totalTax, currency)}</span></div>
+                <div style={{ color: isDarkMode ? '#fff' : '#333' }}>Discount: <span style={{ fontWeight: '600', color: isDarkMode ? '#fff' : '#333' }}>{formatCurrency(Number(discount), currency)}</span></div>
+                <div style={{ fontSize: '1.2em', fontWeight: '700', color: isDarkMode ? '#fff' : '#6a11cb' }}>
                   Total: {formatCurrency(total, currency)}
                 </div>
               </div>

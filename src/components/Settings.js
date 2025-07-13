@@ -6,6 +6,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { getCurrencyOptions, getCurrencyName } from '../utils/currency';
 import './Dashboard.css';
+import './Settings.css';
 import { useTranslation } from 'react-i18next';
 
 const Settings = () => {
@@ -137,37 +138,24 @@ const Settings = () => {
 
         <div className="feature-card" style={{ maxWidth: 'none' }}>
           {message.text && (
-            <div style={{ 
-              padding: '10px', 
-              background: message.type === 'success' ? '#d4edda' : '#f8d7da', 
-              color: message.type === 'success' ? '#155724' : '#721c24', 
-              borderRadius: '5px', 
-              marginBottom: '20px',
-              border: `1px solid ${message.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
-            }}>
+            <div className={`settings-message ${message.type}`}>
               {message.text}
             </div>
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+          <div className="settings-container">
             {/* Currency Settings */}
-            <div>
-              <h3 style={{ marginBottom: '20px', color: '#6a11cb' }}>{t('Currency Settings')}</h3>
+            <div className="settings-section">
+              <h3>{t('Currency Settings')}</h3>
               
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+              <div className="settings-field">
+                <label>
                   {t('Default Currency')}:
                 </label>
                 <select
+                  className="settings-select short"
                   value={settings.defaultCurrency}
                   onChange={(e) => handleSettingChange('defaultCurrency', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '5px',
-                    fontSize: '14px'
-                  }}
                 >
                   {getCurrencyOptions().map(option => (
                     <option key={option.value} value={option.value}>
@@ -175,13 +163,13 @@ const Settings = () => {
                     </option>
                   ))}
                 </select>
-                <small style={{ color: '#666', fontSize: '12px' }}>
+                <small className="settings-help-text">
                   {t('This will be the default currency for new invoices.')}
                 </small>
               </div>
 
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+              <div className="settings-field">
+                <label>
                   {t('Default Tax Rate')} (%):
                 </label>
                 <input
@@ -189,96 +177,65 @@ const Settings = () => {
                   min="0"
                   max="100"
                   step="0.01"
+                  className="settings-input short"
                   value={settings.taxRate}
                   onChange={(e) => handleSettingChange('taxRate', parseFloat(e.target.value) || 0)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '5px',
-                    fontSize: '14px'
-                  }}
                 />
-                <small style={{ color: '#666', fontSize: '12px' }}>
+                <small className="settings-help-text">
                   {t('Default tax rate applied to new line items.')}
                 </small>
               </div>
             </div>
 
             {/* Company Information */}
-            <div>
-              <h3 style={{ marginBottom: '20px', color: '#6a11cb' }}>{t('Company Information')}</h3>
+            <div className="settings-section">
+              <h3>{t('Company Information')}</h3>
               
-              <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+              <div className="settings-field">
+                <label>
                   {t('Company Name')}:
                 </label>
                 <input
                   type="text"
+                  className="settings-input"
                   value={settings.companyName}
                   onChange={(e) => handleSettingChange('companyName', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '5px',
-                    fontSize: '14px'
-                  }}
                 />
               </div>
 
-              <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+              <div className="settings-field">
+                <label>
                   {t('Company Email')}:
                 </label>
                 <input
                   type="email"
+                  className="settings-input"
                   value={settings.companyEmail}
                   onChange={(e) => handleSettingChange('companyEmail', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '5px',
-                    fontSize: '14px'
-                  }}
                 />
               </div>
 
-              <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+              <div className="settings-field">
+                <label>
                   {t('Company Phone')}:
                 </label>
                 <input
                   type="text"
+                  className="settings-input"
                   value={settings.companyPhone}
                   onChange={(e) => handleSettingChange('companyPhone', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '5px',
-                    fontSize: '14px'
-                  }}
                 />
               </div>
 
-              <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+              <div className="settings-field">
+                <label>
                   {t('Company Address')}:
                 </label>
                 <textarea
+                  className="settings-textarea"
                   value={settings.companyAddress}
                   onChange={(e) => handleSettingChange('companyAddress', e.target.value)}
                   rows="3"
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '5px',
-                    fontSize: '14px',
-                    resize: 'vertical'
-                  }}
                 />
               </div>
             </div>
@@ -286,41 +243,35 @@ const Settings = () => {
 
           {/* Invoice Settings */}
           <div style={{ marginTop: '30px' }}>
-            <h3 style={{ marginBottom: '20px', color: '#6a11cb' }}>{t('Invoice Settings')}</h3>
+            <h3>{t('Invoice Settings')}</h3>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+              <div className="settings-field">
+                <label>
                   {t('Invoice Number Prefix')}:
                 </label>
                 <input
                   type="text"
+                  className="settings-input short"
                   value={settings.invoicePrefix}
                   onChange={(e) => handleSettingChange('invoicePrefix', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '5px',
-                    fontSize: '14px'
-                  }}
                 />
-                <small style={{ color: '#666', fontSize: '12px' }}>
+                <small className="settings-help-text">
                   {t('Prefix for invoice numbers (e.g., INV, BILL, etc.)')}
                 </small>
               </div>
 
-              <div>
-                <label style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+              <div className="settings-field">
+                <label className="settings-checkbox-container">
                   <input
                     type="checkbox"
+                    className="settings-checkbox"
                     checked={settings.autoNumbering}
                     onChange={(e) => handleSettingChange('autoNumbering', e.target.checked)}
-                    style={{ marginRight: '8px' }}
                   />
                   {t('Auto-numbering for invoices')}
                 </label>
-                <small style={{ color: '#666', fontSize: '12px' }}>
+                <small className="settings-help-text">
                   {t('Automatically generate sequential invoice numbers')}
                 </small>
               </div>
@@ -329,35 +280,35 @@ const Settings = () => {
 
           {/* Notification Settings */}
           <div style={{ marginTop: '30px' }}>
-            <h3 style={{ marginBottom: '20px', color: '#6a11cb' }}>{t('Notification Settings')}</h3>
+            <h3>{t('Notification Settings')}</h3>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-              <div>
-                <label style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+              <div className="settings-field">
+                <label className="settings-checkbox-container">
                   <input
                     type="checkbox"
+                    className="settings-checkbox"
                     checked={settings.emailNotifications}
                     onChange={(e) => handleSettingChange('emailNotifications', e.target.checked)}
-                    style={{ marginRight: '8px' }}
                   />
                   {t('Email notifications')}
                 </label>
-                <small style={{ color: '#666', fontSize: '12px' }}>
+                <small className="settings-help-text">
                   {t('Receive email notifications for important events')}
                 </small>
               </div>
 
-              <div>
-                <label style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+              <div className="settings-field">
+                <label className="settings-checkbox-container">
                   <input
                     type="checkbox"
+                    className="settings-checkbox"
                     checked={settings.paymentReminders}
                     onChange={(e) => handleSettingChange('paymentReminders', e.target.checked)}
-                    style={{ marginRight: '8px' }}
                   />
                   {t('Payment reminders')}
                 </label>
-                <small style={{ color: '#666', fontSize: '12px' }}>
+                <small className="settings-help-text">
                   {t('Send automatic payment reminders for overdue invoices')}
                 </small>
               </div>
@@ -366,19 +317,9 @@ const Settings = () => {
 
           <div style={{ marginTop: '30px', textAlign: 'center' }}>
             <button
+              className="settings-save-button"
               onClick={handleSave}
               disabled={saving}
-              style={{
-                padding: '12px 30px',
-                fontSize: '16px',
-                background: '#6a11cb',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                fontWeight: '600',
-                opacity: saving ? 0.7 : 1
-              }}
             >
               {saving ? t('Saving...') : t('Save Settings')}
             </button>
