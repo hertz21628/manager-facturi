@@ -1,70 +1,98 @@
-# Getting Started with Create React App
+# Manager Facturi
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, full-featured invoice management web application for businesses and clients. Built with React and Firebase, it supports multi-role authentication, invoice creation, PDF export, reporting, and more.
 
-## Available Scripts
+## ✨ Features
+- **Admin & Client Portals**: Separate dashboards and login/register flows for admins and clients
+- **Role Management**: Assign and manage user roles (admin/client)
+- **Invoice Creation & Management**: Create, edit, and track invoices with customizable line items, taxes, and discounts
+- **PDF Generation**: Export invoices as professional PDFs
+- **Client Management**: Add, update, and organize client information
+- **Reports**: View revenue, outstanding payments, and other analytics
+- **Settings**: Customize company info, default currency, tax rate, and more
+- **Theme & Language Switcher**: Light/dark mode and multi-language support (EN/RO/DE)
+- **Secure Authentication**: Firebase Auth for secure login and registration
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 🚀 Getting Started
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 1. Clone the repository
+```sh
+git clone <your-repo-url>
+cd manager-facturi
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 2. Install dependencies
+> **Note:** If you see dependency conflicts, use the legacy flag as below.
+```sh
+npm install --legacy-peer-deps
+```
 
-### `npm test`
+### 3. Configure Firebase
+Edit `src/firebase.js` with your Firebase project credentials. The default config is for demo/testing only.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 4. Start the development server
+```sh
+npm start
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🧑‍💼 Usage
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Admin Portal
+- Register at `/register` (first user becomes admin)
+- Access dashboard, manage clients, create invoices, view reports, assign roles
+- Admin-only routes are protected
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Client Portal
+- Register at `/client/register`
+- Login at `/client/login`
+- View/download invoices, update profile, make payments (if enabled)
 
-### `npm run eject`
+### Role Management
+- Use the **Role Manager** (`/admin/roles`) to assign roles to users
+- Run the migration script in `src/utils/migrateUsers.js` to assign default roles to existing users
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🛠️ Available Scripts
+- `npm start` – Run the app in development mode
+- `npm run build` – Build for production
+- `npm test` – Run tests
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 📁 Folder Structure
+- `src/components/` – React components (Admin, Client, Auth, Dashboard, etc.)
+- `src/context/` – Auth and Theme context providers
+- `src/utils/` – Utility functions (currency, user migration)
+- `src/firebase.js` – Firebase config and initialization
+- `public/` – Static assets and HTML
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🌐 Customization
+- **Theme:** Switch between light/dark/system in Settings or via ThemeSwitcher
+- **Language:** EN, RO, DE supported (Settings/Profile)
+- **Currency:** Set default currency in Settings
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 🐞 Troubleshooting
+- If `react-scripts` is missing, run `npm install --legacy-peer-deps`
+- For Firebase errors, check your credentials in `src/firebase.js`
+- For role issues, use the Role Manager or migration script
+- For more help, check browser console logs or `/debug` route
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## 📄 License
+MIT (or specify your license here)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 🙏 Credits
+Developed by Murarasu Andrei as a Licenta project. Special thanks to open-source contributors and the React/Firebase communities.
