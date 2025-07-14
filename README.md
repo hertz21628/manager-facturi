@@ -61,7 +61,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## 🛠️ Available Scripts
 - `npm start` – Run the app in development mode
 - `npm run build` – Build for production
-- `npm test` – Run tests
 
 ---
 
@@ -87,12 +86,3 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - For role issues, use the Role Manager or migration script
 - For more help, check browser console logs or `/debug` route
 
----
-
-## 📄 License
-MIT (or specify your license here)
-
----
-
-## 🙏 Credits
-Developed by Murarasu Andrei as a Licenta project. Special thanks to open-source contributors and the React/Firebase communities.
